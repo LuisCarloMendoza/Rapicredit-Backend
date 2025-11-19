@@ -39,3 +39,6 @@ coverage/
 
 # dotenv backups
 .env*.local
+
+# Firebase service account keys
+rapicredit-f52a2-firebase-adminsdk-fbsvc-34bfa26aa4.json
