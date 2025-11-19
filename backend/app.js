@@ -31,6 +31,27 @@ app.get('/', (req, res) => {
 });
 
 // Firebase Admin SDK
+var admin = require("firebase-admin");
+var serviceAccount = require("./rapicredit-f52a2-firebase-adminsdk-fbsvc-34bfa26aa4.json"); 
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+const auth = admin.auth();
+
+/*
+const firebaseConfig = {
+    apiKey: "AIzaSyCuOdploMBF3E6SlB4_y_SfY3xniIfVseI",
+    authDomain: "examen2-ux-c80b8.firebaseapp.com",
+    projectId: "rapicredit-f52a2",
+    storageBucket: "examen2-ux-c80b8.appspot.com",
+    messagingSenderId: "579186092674",
+    appId: "1:579186092674:web:2f863e07fca936e2bb629b",
+    measurementId: "G-SQX3PKBWDP"
+};*/
+
+const firebaseApp = initializeApp(firebaseConfig);
+
 
 // Comenzar el servidor
 async function start() {
@@ -41,6 +62,7 @@ async function start() {
 }
 
 // ---- CRUD ENDPOINTS ----
+
 
 
 start();
