@@ -1,4 +1,4 @@
-import {auth} from '../app.js';
+import {admin} from '../firebase.js';
 
 export async function verifyFirebaseToken(req, res, next) {
   try {
