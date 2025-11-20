@@ -1,7 +1,12 @@
 // app.js
-require('dotenv').config();
-const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+import "./firebase.js";
+import dotenv from 'dotenv';
+import express from 'express';
+import { MongoClient, ServerApiVersion } from 'mongodb';
+import fs from 'fs';
+import admin from 'firebase-admin';
+
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -30,28 +35,15 @@ app.get('/', (req, res) => {
   res.send('Server is running!');
 });
 
-// Firebase Admin SDK
-var admin = require("firebase-admin");
-var serviceAccount = require("./rapicredit-f52a2-firebase-adminsdk-fbsvc-34bfa26aa4.json"); 
+// Firebase Admin SDK (ESM-compatible)
+const serviceAccountPath = new URL('./rapicredit-f52a2-firebase-adminsdk-fbsvc-34bfa26aa4.json', import.meta.url);
+const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf-8'));
+
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount),
 });
 
-const auth = admin.auth();
-
-/*
-const firebaseConfig = {
-    apiKey: "AIzaSyCuOdploMBF3E6SlB4_y_SfY3xniIfVseI",
-    authDomain: "examen2-ux-c80b8.firebaseapp.com",
-    projectId: "rapicredit-f52a2",
-    storageBucket: "examen2-ux-c80b8.appspot.com",
-    messagingSenderId: "579186092674",
-    appId: "1:579186092674:web:2f863e07fca936e2bb629b",
-    measurementId: "G-SQX3PKBWDP"
-};*/
-
-const firebaseApp = initializeApp(firebaseConfig);
-
+export const auth = admin.auth();
 
 // Comenzar el servidor
 async function start() {
