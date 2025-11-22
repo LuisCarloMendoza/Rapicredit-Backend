@@ -16,5 +16,18 @@ export const userRepository = {
 
     updateUserByUid: async (uid, updateData) => {
         return await User.findOneAndUpdate({ uid }, updateData, { new: true });
+    },
+
+    updateUserByCodigoUsuario: async (codigoUsuario, updateData) => {
+        return await User.findOneAndUpdate({ codigoUsuario }, updateData, { new: true });
+    },
+
+    findByUsuario: async (usuario) => {
+        return await User.findOne({ usuario });
+    },
+    
+    findByEmail: async (email) => {
+        return await User.findOne({ email });
     }
+
 }

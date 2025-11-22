@@ -3,12 +3,15 @@ import "./firebase.js";
 import dotenv from 'dotenv';
 import express from 'express';
 import { MongoClient, ServerApiVersion } from 'mongodb';
+import mongoose from 'mongoose';
 import fs from 'fs';
 import admin from 'firebase-admin';
-
+import router from "./routes/users.js";
+import userRouter from "./routes/users.js";
 dotenv.config();
 
 const app = express();
+app.use(express.json());
 const port = process.env.PORT || 3001;
 
 // ---- MongoDB Client ----
@@ -22,8 +25,20 @@ const client = new MongoClient(process.env.MONGODB_URI, {
 // Conectar a MongoDB
 async function connect() {
   try {
+    // Connect Mongoose (used by models)
+    if (!process.env.MONGODB_URI) {
+      throw new Error('MONGODB_URI is not set in environment');
+    }
+    mongoose.set('strictQuery', false);
+    // Connect with default options. Explicit legacy options such as
+    // `useNewUrlParser` and `useUnifiedTopology` are not supported
+    // by the newer MongoDB driver and will cause a MongoParseError.
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('✅ Mongoose connected');
+
+    // Also connect native MongoDB client if you still need it
     await client.connect();
-    console.log('✅ Conectado a la base de datos');
+    console.log('✅ MongoClient connected');
   } catch (error) {
     console.error('❌ Error al conectar a la base de datos:', error);
     process.exit(1);
@@ -35,13 +50,12 @@ app.get('/', (req, res) => {
   res.send('Server is running!');
 });
 
-// Firebase Admin SDK (ESM-compatible)
-const serviceAccountPath = new URL('./rapicredit-f52a2-firebase-adminsdk-fbsvc-34bfa26aa4.json', import.meta.url);
-const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf-8'));
+//Endpoints de Usuarios
+app.use('/api/users', userRouter);
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+
+// Firebase Admin SDK (ESM-compatible)
+
 
 export const auth = admin.auth();
 

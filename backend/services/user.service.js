@@ -1,4 +1,4 @@
-import { userRepository } from "../repositories/user.repository";
+import { userRepository } from "../repositories/user.repository.js";
 import admin from "firebase-admin";
 
 export const userService = {
@@ -18,12 +18,19 @@ export const userService = {
     return user;
   },
 
-  createUser: async ({ codigoUsuario, email, displayName, password }) => {
-    const existingUser = await userRepository.findByCodigoUsuario(
+  createUser: async ({ codigoUsuario, email, password }) => {
+    //TODO Validaciones pa que truene antes de crear en mongo
+    //Falta en Mongo Crear los permisos
+
+    const existingByCodigo = await userRepository.findByCodigoUsuario(
       codigoUsuario
     );
-    if (existingUser) {
+    if (existingByCodigo) {
       throw new Error("A user with this codigoUsuario already exists.");
+    }
+    const existingByEmail = await userRepository.findByEmail(email);
+    if (existingByEmail) {
+      throw new Error("A user with this email already exists.");
     }
 
     let firebaseUser;
@@ -31,24 +38,37 @@ export const userService = {
       firebaseUser = await admin.auth().createUser({
         email,
         password,
-        displayName,
       });
     } catch (error) {
       throw new Error(`Firebase error: ${error.message}`);
     }
 
     const uid = firebaseUser.uid;
-
+    let displayName;
     const newUserData = {
       uid,
-      email,
       codigoUsuario,
-      usuario: displayName,
+      usuario: displayName || codigoUsuario,
+      nombreCompleto: displayName || codigoUsuario,
       rol: "usuario",
       actividad: true,
+      email,
     };
 
     const newUser = await userRepository.createUser(newUserData);
     return newUser;
+  },
+
+  updateUserByUid: async (uid, updateData) => {
+    const updatedUser = await userRepository.updateUserByUid(uid, updateData);
+    return updatedUser;
+  },
+
+  updateUserByCodigoUsuario: async (codigoUsuario, updateData) => {
+    const updatedUser = await userRepository.updateUserByCodigoUsuario(
+      codigoUsuario,
+      updateData
+    );
+    return updatedUser;
   },
 };
