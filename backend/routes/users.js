@@ -8,4 +8,6 @@ userRouter.post("/register", userController.register);
 
 userRouter.post("/login", verifyFirebaseToken, userController.login);
 
+userRouter.put("/:uid", verifyFirebaseToken, userController.updateByUid);
+
 export default userRouter;

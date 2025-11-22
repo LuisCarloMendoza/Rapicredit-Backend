@@ -60,11 +60,26 @@ export const userService = {
   },
 
   updateUserByUid: async (uid, updateData) => {
+    if(!uid){
+      throw new Error("UID is required for updating user");
+    }
+    const existe = await userRepository.findByUid(uid);
+    if(!existe){
+      throw new Error("User with the provided UID does not exist");
+    }
     const updatedUser = await userRepository.updateUserByUid(uid, updateData);
     return updatedUser;
   },
 
+
   updateUserByCodigoUsuario: async (codigoUsuario, updateData) => {
+    if (!codigoUsuario) {
+      throw new Error("codigoUsuario is required for updating user");
+    }
+    const existe = await userRepository.findByCodigoUsuario(codigoUsuario);
+    if (!existe) {
+      throw new Error("User with the provided codigoUsuario does not exist");
+    }
     const updatedUser = await userRepository.updateUserByCodigoUsuario(
       codigoUsuario,
       updateData
