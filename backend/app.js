@@ -3,12 +3,15 @@ import "./firebase.js";
 import dotenv from 'dotenv';
 import express from 'express';
 import { MongoClient, ServerApiVersion } from 'mongodb';
+import mongoose from 'mongoose';
 import fs from 'fs';
 import admin from 'firebase-admin';
-
+import router from "./routes/users.js";
+import userRouter from "./routes/users.js";
 dotenv.config();
 
 const app = express();
+app.use(express.json());
 const port = process.env.PORT || 3001;
 
 // ---- MongoDB Client ----
@@ -26,120 +29,20 @@ let functionsCollection; // apuntará a la colección "funciones"
 // Conectar a MongoDB
 async function connect() {
   try {
-    await client.connect();
-
-    // Nombre de la base de datos
-    db = client.db('Rapicredit');
-
-    // ============================
-    //   ESQUEMA: FUNCIONES (catálogo fijo)
-    // ============================
-
-    const funcionesSchema = {
-      bsonType: "object",
-      required: ["key", "label", "accessType"],
-      properties: {
-        key: {
-          bsonType: "string",
-          description: "Identificador único de la función"
-        },
-        label: {
-          bsonType: "string",
-          description: "Nombre visible de la función"
-        },
-        accessType: {
-          enum: ["WEB", "APP", "BOTH"],
-          description: "Dónde aplica la función (WEB, APP o BOTH)"
-        },
-        module: {
-          bsonType: "string",
-          description: "Módulo o categoría (opcional)"
-        },
-        description: {
-          bsonType: "string",
-          description: "Descripción de la función (opcional)"
-        }
-      },
-      additionalProperties: false
-    };
-
-    await db.command({
-      collMod: "funciones",
-      validator: { $jsonSchema: funcionesSchema },
-      validationLevel: "strict"
-    }).catch(async (err) => {
-      // Si la colección aún no existe, la creamos con el validador
-      if (err.codeName === 'NamespaceNotFound') {
-        await db.createCollection("funciones", {
-          validator: { $jsonSchema: funcionesSchema },
-          validationLevel: "strict"
-        });
-      } else {
-        throw err;
-      }
-    });
-
-    // ============================
-    //   ESQUEMA: TRABAJADORES
-    // ============================
-
-    const trabajadoresSchema = {
-      bsonType: "object",
-      required: ["codigoUsuario", "usuario", "rol", "contrasena", "permisos", "actividad"],
-      properties: {
-        codigoUsuario: {
-          bsonType: "string",
-          description: "Código de usuario (lo podemos generar automáticamente)"
-      },
-      usuario: {
-        bsonType: "string",
-        description: "Nombre de usuario para iniciar sesión"
-      },
-      rol: {
-        enum: ["Gerente", "Supervisor", "Asesor"],
-        description: "Rol del trabajador"
-      },
-      asignado: {
-        bsonType: "string",
-        description: "A quién o qué está asignado (oficina, zona, etc.)"
-      },
-      contrasena: {
-        bsonType: "string",
-        description: "Contraseña (idealmente ya hasheada)"
-      },
-      permisos: {
-        bsonType: "array",
-        items: { bsonType: "string" }, // keys de funciones
-        description: "Lista de keys de funciones asignadas al trabajador"
-      },
-      actividad: {
-        enum: ["Activo", "Inactivo"],
-        description: "Estado del trabajador (Activo o Inactivo)"
-      }
-    },
-    additionalProperties: false
-  };
-
-  await db.command({
-   collMod: "trabajadores",
-    validator: { $jsonSchema: trabajadoresSchema },
-    validationLevel: "strict"
-  }).catch(async (err) => {
-    if (err.codeName === 'NamespaceNotFound') {
-      await db.createCollection("trabajadores", {
-        validator: { $jsonSchema: trabajadoresSchema },
-        validationLevel: "strict"
-      });
-    } else {
-      throw err;
+    // Connect Mongoose (used by models)
+    if (!process.env.MONGODB_URI) {
+      throw new Error('MONGODB_URI is not set in environment');
     }
-  });
+    mongoose.set('strictQuery', false);
+    // Connect with default options. Explicit legacy options such as
+    // `useNewUrlParser` and `useUnifiedTopology` are not supported
+    // by the newer MongoDB driver and will cause a MongoParseError.
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('✅ Mongoose connected');
 
-    // Handlers de las colecciones
-    workersCollection = db.collection('trabajadores');
-    functionsCollection = db.collection('funciones');
-
-    console.log('✅ Conectado a la base de datos Rapicredit');
+    // Also connect native MongoDB client if you still need it
+    await client.connect();
+    console.log('✅ MongoClient connected');
   } catch (error) {
     console.error('❌ Error al conectar a la base de datos:', error);
     process.exit(1);
@@ -151,7 +54,12 @@ app.get('/', (req, res) => {
   res.send('Server is running!');
 });
 
+//Endpoints de Usuarios
+app.use('/api/users', userRouter);
+
+
 // Firebase Admin SDK (ESM-compatible)
+
 
 export const auth = admin.auth();
 

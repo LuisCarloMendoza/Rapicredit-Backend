@@ -1,9 +1,11 @@
-var express = require('express');
-var router = express.Router();
+import express from "express";
+import { userController } from "../controllers/user.controller.js";
+import { verifyFirebaseToken } from "../middleware/verifyFirebaseToken.js";
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+const userRouter = express.Router();
 
-module.exports = router;
+userRouter.post("/register", userController.register);
+
+userRouter.post("/login", verifyFirebaseToken, userController.login);
+
+export default userRouter;
