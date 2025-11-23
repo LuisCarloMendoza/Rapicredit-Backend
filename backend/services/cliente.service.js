@@ -1,7 +1,64 @@
 import { clienteRepository } from "../repositories/cliente.repository.js";
 
 export const clienteService = {
+  // --- Validation helpers ---
+  _isValidEmail: (email) => {
+    if (typeof email !== 'string') return false;
+    // simple email regex
+    return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
+  },
+
+  _isValidDate: (d) => {
+    if (d === null || d === undefined || d === '') return false;
+    const date = new Date(d);
+    return !Number.isNaN(date.getTime());
+  },
+
+  _validateCreateData: (data) => {
+    const required = [
+      'codigoCliente', 'identidadCliente', 'nacionalidad', 'RTN', 'estadoCivil',
+      'nivelEducativo', 'tipoVivienda', 'antiguedadVivenda', 'numerosDependientes',
+      'listadoDependientes', 'edadDependientes', 'zonaResidencialCliente', 'nombre',
+      'apellido', 'email', 'telefono', 'direccion', 'sexo', 'fechaNacimiento',
+      'frecuenciaPago', 'estadoDeuda'
+    ];
+    const missing = [];
+    for (const key of required) {
+      if (data[key] === undefined || data[key] === null) missing.push(key);
+    }
+    if (missing.length) throw new Error(`Missing required fields: ${missing.join(', ')}`);
+
+    if (!clienteService._isValidEmail(data.email)) throw new Error('Invalid email format');
+    if (!clienteService._isValidDate(data.fechaNacimiento)) throw new Error('Invalid fechaNacimiento (expected date)');
+    if (!Array.isArray(data.telefono) || data.telefono.length === 0) throw new Error('telefono must be a non-empty array of strings');
+    if (!Array.isArray(data.numerosDependientes)) throw new Error('numerosDependientes must be an array of numbers');
+    if (!Array.isArray(data.listadoDependientes)) throw new Error('listadoDependientes must be an array of strings');
+    if (!Array.isArray(data.edadDependientes)) throw new Error('edadDependientes must be an array of numbers');
+    if (typeof data.antiguedadVivenda !== 'number') throw new Error('antiguedadVivenda must be a number');
+    if (data.limiteCredito !== undefined && typeof data.limiteCredito !== 'number') throw new Error('limiteCredito must be a number');
+    if (data.tasaCliente !== undefined && typeof data.tasaCliente !== 'number') throw new Error('tasaCliente must be a number');
+  },
+
+  _validateUpdateData: (updateData) => {
+    if (!updateData || typeof updateData !== 'object') throw new Error('Invalid update payload');
+    if (Object.prototype.hasOwnProperty.call(updateData, 'codigoCliente')) {
+      throw new Error('codigoCliente cannot be updated');
+    }
+    if (updateData.email !== undefined && !clienteService._isValidEmail(updateData.email)) throw new Error('Invalid email format');
+    if (updateData.fechaNacimiento !== undefined && !clienteService._isValidDate(updateData.fechaNacimiento)) throw new Error('Invalid fechaNacimiento (expected date)');
+    if (updateData.telefono !== undefined && (!Array.isArray(updateData.telefono) || updateData.telefono.length === 0)) throw new Error('telefono must be a non-empty array of strings');
+    if (updateData.numerosDependientes !== undefined && !Array.isArray(updateData.numerosDependientes)) throw new Error('numerosDependientes must be an array of numbers');
+    if (updateData.listadoDependientes !== undefined && !Array.isArray(updateData.listadoDependientes)) throw new Error('listadoDependientes must be an array of strings');
+    if (updateData.edadDependientes !== undefined && !Array.isArray(updateData.edadDependientes)) throw new Error('edadDependientes must be an array of numbers');
+    if (updateData.antiguedadVivenda !== undefined && typeof updateData.antiguedadVivenda !== 'number') throw new Error('antiguedadVivenda must be a number');
+    if (updateData.limiteCredito !== undefined && typeof updateData.limiteCredito !== 'number') throw new Error('limiteCredito must be a number');
+    if (updateData.tasaCliente !== undefined && typeof updateData.tasaCliente !== 'number') throw new Error('tasaCliente must be a number');
+  },
+
   createCliente: async (clienteData) => {
+    // Validate payload
+    clienteService._validateCreateData(clienteData);
+
     const existingCliente = await clienteRepository.findByCodigoCliente(clienteData.codigoCliente);
     if (existingCliente) {
       throw new Error("A cliente with this codigoCliente already exists.");
@@ -11,6 +68,13 @@ export const clienteService = {
   },
 
   updateClienteByCodigo: async (codigoCliente, updateData) => {
+    // If the client accidentally includes codigoCliente in the payload, ignore it (don't fail)
+    if (updateData && Object.prototype.hasOwnProperty.call(updateData, 'codigoCliente')) {
+      delete updateData.codigoCliente;
+    }
+
+    // Validate update payload (types and formats)
+    clienteService._validateUpdateData(updateData);
     const existingCliente = await clienteRepository.findByCodigoCliente(codigoCliente);
     if (!existingCliente) {
       throw new Error("Cliente with the provided codigoCliente does not exist.");
