@@ -10,6 +10,9 @@ import router from "./routes/users.js";
 import userRouter from "./routes/users.js";
 import clienteRouter from "./routes/clients.js";
 import permisoRouter from "./routes/permisos.js";
+import financiamientosRouter from "./routes/financiamientos.js";
+import amortizacionesRouter from "./routes/amortizaciones.js";
+import parametrosRouter from "./routes/parametros.js";
 dotenv.config();
 
 const app = express();
@@ -58,6 +61,15 @@ app.use('/api/users', userRouter);
 app.use('/api/clientes', clienteRouter);
 // Endpoints de Permisos
 app.use('/api/permisos', permisoRouter);
+
+// Endpoints de Financiamientos
+app.use('/api/financiamientos', financiamientosRouter);
+
+// Endpoints de Amortizaciones 
+app.use('/api/amortizaciones', amortizacionesRouter);
+
+// Endpoints de Parámetros
+app.use('/api/parametros', parametrosRouter);
 
 
 // Firebase Admin SDK (ESM-compatible)
