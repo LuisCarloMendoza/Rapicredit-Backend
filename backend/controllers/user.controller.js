@@ -3,12 +3,8 @@ import { userService } from "../services/user.service.js";
 export const userController = {
   register: async (req, res) => {
     try {
-      const { codigoUsuario, email, password } = req.body;
-      const newUser = await userService.createUser({
-        codigoUsuario,
-        email,
-        password,
-      });
+      // forward full registration payload to service (service will validate required fields)
+      const newUser = await userService.createUser(req.body);
       res.status(201).json(newUser);
     } catch (error) {
       res.status(400).json({ message: error.message });

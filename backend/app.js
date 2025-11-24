@@ -9,6 +9,7 @@ import admin from 'firebase-admin';
 import router from "./routes/users.js";
 import userRouter from "./routes/users.js";
 import clienteRouter from "./routes/clients.js";
+import permisoRouter from "./routes/permisos.js";
 dotenv.config();
 
 const app = express();
@@ -55,6 +56,8 @@ app.get('/', (req, res) => {
 app.use('/api/users', userRouter);
 //Endpoints de Clientes
 app.use('/api/clientes', clienteRouter);
+// Endpoints de Permisos
+app.use('/api/permisos', permisoRouter);
 
 
 // Firebase Admin SDK (ESM-compatible)
