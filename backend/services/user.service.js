@@ -5,6 +5,9 @@ export const userService = {
   getUserByUid: async (uid) => {
     return await userRepository.findByUid(uid);
   },
+  getUserByUsuario: async (usuario) => {
+    return await userRepository.findByUsuario(usuario);
+  },
 
   loginByFirebaseUser: async (firebaseUser) => {
     const { uid } = firebaseUser;
@@ -14,6 +17,26 @@ export const userService = {
     let user = await userRepository.findByUid(uid);
     if (!user) {
       throw new Error("User not found");
+    }
+    return user;
+  },
+
+  getUserByUserPassword: async (usuario) => {
+    const user = await userRepository.findByUsuario(usuario);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    return user;
+  },
+
+  loginByUserPassword: async (usuario, password) => {
+    const user = await userRepository.findByUsuario(usuario);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    if (user.contraseña !== password) {
+      throw new Error("Invalid password");
     }
     return user;
   },

@@ -6,8 +6,10 @@ const userRouter = express.Router();
 
 userRouter.post("/register", userController.register);
 
-userRouter.post("/login", verifyFirebaseToken, userController.login);
+userRouter.post("/login", userController.login);
 
 userRouter.put("/:uid", verifyFirebaseToken, userController.updateByUid);
+
+userRouter.get("/:usuario", userController.getUserByUsuario);
 
 export default userRouter;

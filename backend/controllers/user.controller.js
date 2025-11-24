@@ -16,9 +16,11 @@ export const userController = {
   },
   login: async (req, res) => {
     try {
-      const firebaseUser = req.body.email;
+      const usuario = req.body.usuario;
       const password = req.body.password;
-      const user = await userService.loginByFirebaseUser(firebaseUser, password);
+      const firebaseUser = await userService.getUserByUsuario(usuario);
+      const firebaseUserEmail = firebaseUser.email;
+      const user = await userService.loginByUserPassword(usuario, password);
       res.status(200).json(user);
     } catch (error) {
       res.status(401).json({ message: error.message });
@@ -45,4 +47,14 @@ export const userController = {
       res.status(400).json({ message: error.message });
     }
   },
+
+  getUserByUsuario: async (req, res) => {
+    try {
+      const usuario = req.params.usuario;
+      const user = await userService.getUserByUsuario(usuario);
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(404).json({ message: error.message });
+    }
+  }
 };
