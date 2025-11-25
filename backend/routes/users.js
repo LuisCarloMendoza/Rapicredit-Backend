@@ -6,7 +6,9 @@ const userRouter = express.Router();
 
 userRouter.post("/register", userController.register);
 
-userRouter.post("/login", verifyFirebaseToken, userController.login);
+// Do not require the Firebase token middleware for login so users can
+// authenticate with credentials (`usuario`/`email` + `password`).
+userRouter.post("/login", userController.login);
 
 userRouter.put("/:uid", verifyFirebaseToken, userController.updateByUid);
 

@@ -18,6 +18,30 @@ export const userService = {
     return user;
   },
 
+  // Credential-based login: identifier may be { usuario } or { email }
+  loginWithCredentials: async ({ usuario, email, password }) => {
+    if (!password) throw new Error('Password is required');
+
+    let user = null;
+    if (usuario) {
+      user = await userRepository.findByUsuario(usuario);
+    } else if (email) {
+      user = await userRepository.findByEmail(email);
+    }
+
+    if (!user) {
+      throw new Error('Invalid credentials');
+    }
+
+    // NOTE: current implementation stores `contraseña` plainly. Compare directly.
+    // Consider hashing passwords in the future.
+    if (user.contraseña !== password) {
+      throw new Error('Invalid credentials');
+    }
+
+    return user;
+  },
+
   createUser: async (userData) => {
     // Expected fields: codigoUsuario, email, password, usuario, nombreCompleto, telefono
     if (!userData || typeof userData !== 'object') throw new Error('Invalid registration payload');
