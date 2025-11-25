@@ -12,8 +12,12 @@ import clienteRouter from "./routes/clients.js";
 import permisoRouter from "./routes/permisos.js";
 import financiamientosRouter from "./routes/financiamientos.js";
 import amortizacionesRouter from "./routes/amortizaciones.js";
+import abonosRouter from "./routes/abonos.js";
 import parametrosRouter from "./routes/parametros.js";
 import solicitudesRouter from "./routes/solicitudes.js";
+import frecuenciasRouter from "./routes/frecuencias.js";
+import tasasRouter from "./routes/tasas.js";
+import gastosRouter from "./routes/gastos.js";
 dotenv.config();
 
 const app = express();
@@ -75,6 +79,15 @@ app.use('/api/parametros', parametrosRouter);
 // Endpoints de Solicitudes
 app.use('/api/solicitudes', solicitudesRouter);
 
+// Endpoints de Tasas de Interés
+app.use('/api/tasas', tasasRouter);
+
+// Endpoints de Abonos
+app.use('/api/abonos', abonosRouter);
+
+// Endpoints de Gastos
+app.use('/api/gastos', gastosRouter);
+
 
 // Firebase Admin SDK (ESM-compatible)
 
@@ -82,6 +95,9 @@ app.use('/api/solicitudes', solicitudesRouter);
 export const auth = admin.auth();
 
 // Comenzar el servidor
+
+// Endpoints de Frecuencias de Pago
+app.use('/api/frecuencias', frecuenciasRouter);
 async function start() {
   await connect();
   app.listen(port, () => {
