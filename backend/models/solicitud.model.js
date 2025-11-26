@@ -4,10 +4,10 @@ const solicitudSchema = new mongoose.Schema(
   {
     codigoSolicitud: { type: String, unique: true, required: true, immutable: true },
     clienteId: { type: mongoose.Schema.Types.ObjectId, ref: 'Cliente', required: true },
-    vendedorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario', required: true },
+    vendedorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     capitalSolicitado: { type: Number, required: true },
-    tasInteresId: { type: mongoose.Schema.Types.ObjectId, ref: 'TasaInteres', required: true },
-    frecuenciaPagoId: { type: mongoose.Schema.Types.ObjectId, ref: 'FrecuenciaPago', required: true },
+    tasInteresId: { type: mongoose.Schema.Types.ObjectId, required: false },
+    frecuenciaPagoId: { type: mongoose.Schema.Types.ObjectId, required: false },
     plazoCuotas: { type: Number, required: true },
     fechaSolicitud: { type: Date, required: true, default: Date.now },
     finalidadCredito: { type: String, required: true },
@@ -24,8 +24,8 @@ const solicitudSchema = new mongoose.Schema(
       default: 'REGISTRADA'
     },
     observaciones: { type: String, default: '' },
-    usuarioCreacionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario', required: true },
-    usuarioDecisionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario', default: null },
+    usuarioCreacionId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    usuarioDecisionId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   }, 
   { timestamps: true }
 );

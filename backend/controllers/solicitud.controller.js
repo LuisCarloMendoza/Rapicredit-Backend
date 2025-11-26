@@ -37,7 +37,7 @@ export const solicitudController = {
       const solicitud = await solicitudService.getSolicitudByCodigo(codigoSolicitud);
       res.status(200).json(solicitud);
     } catch (error) {
-      res.status(403).json({ message: error.message });
+      res.status(400).json({ message: error.message });
     }
   },
 
@@ -57,7 +57,7 @@ export const solicitudController = {
       const solicitudes = await solicitudService.getSolicitudesByCliente(clienteId);
       res.status(200).json(solicitudes);
     } catch (error) {
-      res.status(403).json({ message: error.message });
+      res.status(400).json({ message: error.message });
     }
   },
 
@@ -67,7 +67,7 @@ export const solicitudController = {
       const solicitudes = await solicitudService.getSolicitudesByVendedor(vendedorId);
       res.status(200).json(solicitudes);
     } catch (error) {
-      res.status(403).json({ message: error.message });
+      res.status(400).json({ message: error.message });
     }
   },
 
@@ -77,7 +77,7 @@ export const solicitudController = {
       const solicitudes = await solicitudService.getSolicitudesByEstado(estadoSolicitud);
       res.status(200).json(solicitudes);
     } catch (error) {
-      res.status(403).json({ message: error.message });
+      res.status(400).json({ message: error.message });
     }
   },
 
@@ -98,7 +98,7 @@ export const solicitudController = {
       const solicitudes = await solicitudService.filterSolicitudes(filters);
       res.status(200).json(solicitudes);
     } catch (error) {
-      res.status(403).json({ message: error.message });
+      res.status(400).json({ message: error.message });
     }
   },
 };

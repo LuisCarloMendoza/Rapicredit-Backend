@@ -4,6 +4,7 @@ import express from 'express';
 import request from 'supertest';
 import solicitudRouter from '../routes/solicitudes.js';
 import Cliente from '../models/cliente.model.js';
+import User from '../models/user.model.js';
 import Solicitud from '../models/solicitud.model.js';
 
 let mongod;
