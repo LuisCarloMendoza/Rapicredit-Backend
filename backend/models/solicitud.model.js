@@ -24,7 +24,7 @@ const solicitudSchema = new mongoose.Schema(
       default: 'REGISTRADA'
     },
     observaciones: { type: String, default: '' },
-    usuarioCreacionId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    usuarioCreacionId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false }, //TODO CAMBIAR A TRUE
     usuarioDecisionId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   }, 
   { timestamps: true }
