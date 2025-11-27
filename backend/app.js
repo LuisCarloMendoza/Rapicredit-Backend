@@ -18,10 +18,12 @@ import gastosRouter from "./routes/gasto.js";
 import abonosRouter from "./routes/abonos.js";
 import tasasRouter from "./routes/tasas.js";
 import frecuenciasRouter from "./routes/frecuencias.js";
+import cors from 'cors'; //CORS
 dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(cors()); //Habilitar CORS para todas las rutas
 const port = process.env.PORT || 3001;
 
 // ---- MongoDB Client ----
