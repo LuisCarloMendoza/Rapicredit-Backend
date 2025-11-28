@@ -1,5 +1,9 @@
 import { userRepository } from "../repositories/user.repository.js";
 import admin from "firebase-admin";
+import bcrypt from "bcrypt";
+
+const SALT_ROUNDS = 10;
+
 
 export const userService = {
   getUserByUid: async (uid) => {
@@ -14,6 +18,10 @@ export const userService = {
     let user = await userRepository.findByUid(uid);
     if (!user) {
       throw new Error("User not found");
+    }
+    const passwordMatch = await bcrypt.compare(password, user.contraseña);
+    if (!passwordMatch) {
+      throw new Error('Invalid credentials');
     }
     return user;
   },
@@ -107,9 +115,9 @@ export const userService = {
       telefono,
       permisos: Array.isArray(permisos) ? permisos : [],
       // store contraseña in the field required by schema; using plain password here (consider hashing in future)
-      contraseña: password,
+      contraseña: await bcrypt.hash(password, SALT_ROUNDS),
     };
-
+    
     const newUser = await userRepository.createUser(newUserData);
     return newUser;
   },
