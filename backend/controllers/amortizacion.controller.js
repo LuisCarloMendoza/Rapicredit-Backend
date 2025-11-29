@@ -51,4 +51,15 @@ export const amortizacionController = {
       res.status(400).json({ message: error.message });
     }
   }
+  ,
+
+  generateAmortizacion: (req, res) => {
+    try {
+      const params = req.body;
+      const schedule = amortizacionService.generateAmortizacion(params);
+      res.status(200).json(schedule);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
 };

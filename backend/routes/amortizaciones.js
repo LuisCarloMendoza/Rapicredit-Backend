@@ -14,4 +14,7 @@ router.get('/:id', amortizacionController.getById);
 router.put('/:id', amortizacionController.updateById);
 router.delete('/:id', amortizacionController.deleteById);
 
+// Generate amortization schedule
+router.post('/generate', amortizacionController.generateAmortizacion); 
+
 export default router;

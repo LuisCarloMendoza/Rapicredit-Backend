@@ -65,4 +65,56 @@ export const amortizacionService = {
   deleteById: async (id) => {
     return await amortizacionRepository.deleteById(id);
   }
+,
+
+  generateAmortizacion: ({ capital, tasa, frecuencia, plazo }) => {
+    // Basic validation and normalization
+    const c = Number(capital);
+    const t = Number(tasa);
+    const f = Number(frecuencia);
+    const p = Number(plazo);
+
+    if (!Number.isFinite(c) || c <= 0) throw new Error('capital must be a positive number');
+    if (!Number.isFinite(t) || t <= 0) throw new Error('tasa must be a positive number');
+    if (!Number.isFinite(f) || f <= 0) throw new Error('frecuencia must be a positive number');
+    if (!Number.isFinite(p) || p <= 0) throw new Error('plazo must be a positive number');
+
+    const saldoInicial = c;
+    const tasaPeriodica = t / f;
+    const numeroPagos = f * p;
+
+    // Annuity payment formula
+    const cuota =
+      saldoInicial *
+      (tasaPeriodica * Math.pow(1 + tasaPeriodica, numeroPagos)) /
+      (Math.pow(1 + tasaPeriodica, numeroPagos) - 1);
+
+    let saldo = saldoInicial;
+    const calendario = [];
+
+    for (let i = 1; i <= numeroPagos; i++) {
+      const interes = saldo * tasaPeriodica;
+      const amortizacion = cuota - interes;
+      const saldoFinal = saldo - amortizacion;
+
+      calendario.push({
+        periodo: i,
+        saldoInicial: parseFloat(saldo.toFixed(2)),
+        cuota: parseFloat(cuota.toFixed(2)),
+        interes: parseFloat(interes.toFixed(2)),
+        amortizacion: parseFloat(amortizacion.toFixed(2)),
+        saldoFinal: parseFloat(saldoFinal.toFixed(2)),
+      });
+
+      saldo = saldoFinal;
+    }
+
+    return {
+      capital: saldoInicial,
+      tasaPeriodica,
+      numeroPagos,
+      cuota: parseFloat(cuota.toFixed(2)),
+      calendario,
+    };
+  }
 };
