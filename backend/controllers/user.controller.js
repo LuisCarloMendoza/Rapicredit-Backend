@@ -64,4 +64,23 @@ export const userController = {
       res.status(400).json({ message: error.message });
     }
   },
+
+  getAll: async (req, res) => {
+    try {
+      const users = await User.find().select("-contraseña"); 
+      // select() oculta la contraseña por seguridad
+
+      res.status(200).json({
+        ok: true,
+        total: users.length,
+        users,
+      });
+    } catch (error) {
+      res.status(500).json({
+        ok: false,
+        msg: "Error al obtener los usuarios",
+        error: error.message,
+      });
+    }
+  }
 };

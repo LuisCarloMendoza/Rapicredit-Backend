@@ -12,4 +12,6 @@ userRouter.post("/login", userController.login);
 
 userRouter.put("/:uid", verifyFirebaseToken, userController.updateByUid);
 
+userRouter.get("/", verifyFirebaseToken, userController.getAll);
+
 export default userRouter;
