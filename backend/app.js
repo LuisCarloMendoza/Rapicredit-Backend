@@ -104,9 +104,6 @@ async function start() {
   });
 }
 
-// ---- CRUD ENDPOINTS ----
-
-
 
 start();
 

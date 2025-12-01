@@ -41,9 +41,8 @@ export const userService = {
       throw new Error('Invalid credentials');
     }
 
-    // NOTE: current implementation stores `contraseña` plainly. Compare directly.
-    // Consider hashing passwords in the future.
-    if (user.contraseña !== password) {
+    const passwordMatch = await bcrypt.compare(password, user.contraseña);
+    if (!passwordMatch) {
       throw new Error('Invalid credentials');
     }
 

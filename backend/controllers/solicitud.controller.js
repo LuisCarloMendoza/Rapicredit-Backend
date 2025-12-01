@@ -1,4 +1,19 @@
 import { solicitudService } from '../services/solicitud.service.js';
+import Solicitud from '../models/solicitud.model.js'; 
+
+const getSolicitudRawByCodigo = async (codigoSolicitud) => {
+  const solicitud = await Solicitud.findOne({ codigoSolicitud })
+    .populate("clienteId")
+    .populate("vendedorId");
+
+  if (!solicitud) return null;
+
+  return {
+    ...solicitud.toObject(), // uso toObject() para obtener un objeto plano
+    cliente: solicitud.clienteId,
+    vendedor: solicitud.vendedorId,
+  };
+};
 
 export const solicitudController = {
   createSolicitud: async (req, res) => {
@@ -101,4 +116,7 @@ export const solicitudController = {
       res.status(400).json({ message: error.message });
     }
   },
+
+  //Exponer el helper para que el router pueda usarlo en la generación del PDF
+  getSolicitudRawByCodigo,
 };
