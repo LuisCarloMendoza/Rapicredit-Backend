@@ -1,5 +1,7 @@
 import Solicitud from '../models/solicitud.model.js';
 import Cliente from '../models/cliente.model.js';
+import { amortizacionService } from './amortizacion.service.js';
+import mongoose from 'mongoose';
 
 export const solicitudService = {
   createSolicitud: async (solicitudData) => {
@@ -15,6 +17,40 @@ export const solicitudService = {
       const cliente = await Cliente.findById(clienteId);
       if (!cliente) {
         throw new Error(`Cliente with id ${clienteId} does not exist`);
+      }
+
+      // Calcular tabla de amortización y cuota/comisión estimada si el request incluye tasa y frecuencia numéricas
+      try {
+        const tasaNum = solicitudData.tasa !== undefined ? Number(solicitudData.tasa) : undefined;
+        const frecuenciaNum = solicitudData.frecuencia !== undefined ? Number(solicitudData.frecuencia) : undefined;
+
+        if (tasaNum !== undefined && !Number.isNaN(tasaNum) && frecuenciaNum !== undefined && !Number.isNaN(frecuenciaNum)) {
+          // plazoCuotas en el modelo es número de cuotas; convertir a años para la función (años = plazoCuotas / frecuencia)
+          const plazoAnios = Number(plazoCuotas) / Number(frecuenciaNum);
+          const schedule = amortizacionService.generateAmortization({ capital: Number(capitalSolicitado), tasa: Number(tasaNum), frecuencia: Number(frecuenciaNum), plazo: plazoAnios });
+
+          // Guardar tabla de amortización
+          solicitudData.tablaAmortizacion = schedule.calendario;
+
+          // cuota base estimada
+          solicitudData.cuotaEstimado = schedule.cuota;
+
+          // calcular comisión estimada
+          // Por defecto tomar 2% si el frontend no envía `comisionPorcentaje`
+          const defaultCommissionRate = 0.02;
+          const commissionRate = solicitudData.comisionPorcentaje !== undefined ? Number(solicitudData.comisionPorcentaje) : defaultCommissionRate;
+          const comisionMonto = parseFloat((Number(capitalSolicitado) * commissionRate).toFixed(2));
+          const cuotaAdicional = schedule.numeroPagos ? parseFloat((comisionMonto / schedule.numeroPagos).toFixed(2)) : parseFloat(comisionMonto.toFixed(2));
+
+          solicitudData.cuotaEstimadaComision = {
+            porcentaje: commissionRate,
+            monto: comisionMonto,
+            cuotaAdicionalPorPeriodo: cuotaAdicional,
+          };
+        }
+      } catch (errCalc) {
+        // No bloquear creación por errores en cálculo; registrar el error si se necesita (por ahora re-lanzamos para visibilidad)
+        throw new Error(`Error calculando amortización/comisión: ${errCalc.message}`);
       }
 
       // Crear solicitud
