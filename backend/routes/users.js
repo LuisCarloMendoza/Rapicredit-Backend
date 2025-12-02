@@ -10,8 +10,8 @@ userRouter.post("/register", userController.register);
 // authenticate with credentials (`usuario`/`email` + `password`).
 userRouter.post("/login", userController.login);
 
-userRouter.put("/:uid", verifyFirebaseToken, userController.updateByUid);
+userRouter.put("/:uid",  userController.updateByUid);
 
-userRouter.get("/", verifyFirebaseToken, userController.getAll);
+userRouter.get("/",  userController.getAll);
 
 export default userRouter;

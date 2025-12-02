@@ -1,5 +1,6 @@
 import { userService } from "../services/user.service.js";
 import admin from "firebase-admin";
+import User from '../models/user.model.js';
 
 export const userController = {
   register: async (req, res) => {
