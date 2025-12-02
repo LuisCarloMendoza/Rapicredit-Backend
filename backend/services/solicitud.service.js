@@ -53,6 +53,7 @@ export const solicitudService = {
         throw new Error(`Error calculando amortización/comisión: ${errCalc.message}`);
       }
 
+      
       // Crear solicitud
       const solicitud = new Solicitud(solicitudData);
       await solicitud.save();
