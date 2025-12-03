@@ -14,4 +14,7 @@ userRouter.put("/:uid",  userController.updateByUid);
 
 userRouter.get("/",  userController.getAll);
 
+// Delete user by codigoUsuario
+userRouter.delete("/codigo/:codigoUsuario", userController.deleteByCodigoUsuario);
+
 export default userRouter;

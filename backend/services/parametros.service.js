@@ -56,4 +56,11 @@ export const parametrosService = {
     if (!item) throw new Error('Parametros with the provided codigoParametros does not exist.');
     return item;
   },
+
+  deleteParametrosByCodigo: async (codigoParametros) => {
+    if (!codigoParametros) throw new Error('codigoParametros is required for deleting parametros');
+    const existing = await parametrosRepository.findByCodigoParametros(codigoParametros);
+    if (!existing) throw new Error('Parametros with the provided codigoParametros does not exist.');
+    return await parametrosRepository.deleteParametrosByCodigo(codigoParametros);
+  },
 };

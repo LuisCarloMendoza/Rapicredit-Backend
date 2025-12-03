@@ -86,5 +86,12 @@ export const abonoService = {
 
   deleteById: async (id) => {
     return await abonoRepository.deleteById(id);
+  },
+
+  deleteByCodigo: async (codigoAbono) => {
+    if (!codigoAbono) throw new Error('codigoAbono is required for deleting abono');
+    const existing = await abonoRepository.findByCodigoAbono(codigoAbono);
+    if (!existing) throw new Error('Abono with the provided codigoAbono does not exist.');
+    return await abonoRepository.deleteByCodigoAbono(codigoAbono);
   }
 };

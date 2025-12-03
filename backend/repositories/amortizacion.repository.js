@@ -7,11 +7,11 @@ export const amortizacionRepository = {
   },
 
   findById: async (id) => {
-    return await Amortizacion.findById(id);
+    return await Amortizacion.findOne({ _id: id, activo: true });
   },
 
   findByFinanciamientoId: async (financiamientoId) => {
-    return await Amortizacion.find({ financiamientoId }).sort({ orden: 1, fecha: 1 });
+    return await Amortizacion.find({ financiamientoId, activo: true }).sort({ orden: 1, fecha: 1 });
   },
 
   updateById: async (id, updateData) => {
@@ -22,6 +22,6 @@ export const amortizacionRepository = {
   },
 
   deleteById: async (id) => {
-    return await Amortizacion.findByIdAndDelete(id);
+    return await Amortizacion.findByIdAndUpdate(id, { activo: false }, { new: true });
   }
 };

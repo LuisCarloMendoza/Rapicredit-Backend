@@ -22,6 +22,7 @@ const financiamientoSchema = new Schema(
     totalPagado: { type: Number, default: 0 },
     totalMoraCobrada: { type: Number, default: 0 },
     observaciones: { type: String, default: '' },
+    activo: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

@@ -40,4 +40,14 @@ export const parametrosController = {
       res.status(403).json({ message: error.message });
     }
   },
+
+  deleteParametrosByCodigo: async (req, res) => {
+    try {
+      const codigoParametros = req.params.codigoParametros;
+      await parametrosService.deleteParametrosByCodigo(codigoParametros);
+      res.status(204).end();
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  },
 };

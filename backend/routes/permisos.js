@@ -7,5 +7,6 @@ permisoRouter.post("/", permisoController.createPermiso);
 permisoRouter.put("/:codigoPermiso", permisoController.updatePermisoByCodigo);
 permisoRouter.get("/", permisoController.getAllPermisos);
 permisoRouter.get("/:codigoPermiso", permisoController.getPermisoByCodigo);
+permisoRouter.delete("/:codigoPermiso", permisoController.deletePermisoByCodigo);
 
 export default permisoRouter;

@@ -20,6 +20,7 @@ const abonoSchema = new Schema(
     rutaComprobanteFotoId: { type: Schema.Types.ObjectId, required: false },
     observaciones: { type: String, required: false, default: '' },
     tipoAbono: { type: String, required: true, default: 'NORMAL' },
+    activo: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

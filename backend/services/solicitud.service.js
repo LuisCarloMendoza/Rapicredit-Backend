@@ -31,7 +31,7 @@ export const solicitudService = {
 
   getSolicitudByCodigo: async (codigoSolicitud) => {
     try {
-      const solicitud = await Solicitud.findOne({ codigoSolicitud })
+      const solicitud = await Solicitud.findOne({ codigoSolicitud, activo: true })
         .populate('clienteId')
         .populate('vendedorId')
         .populate('tasInteresId')
@@ -50,7 +50,7 @@ export const solicitudService = {
 
   getAllSolicitudes: async () => {
     try {
-      const solicitudes = await Solicitud.find()
+      const solicitudes = await Solicitud.find({ activo: true })
         .populate('clienteId')
         .populate('vendedorId')
         .populate('tasInteresId')
@@ -70,7 +70,7 @@ export const solicitudService = {
       delete updateData.codigoSolicitud;
 
       const solicitud = await Solicitud.findOneAndUpdate(
-        { codigoSolicitud },
+        { codigoSolicitud, activo: true },
         updateData,
         { new: true, runValidators: true }
       );
@@ -86,12 +86,16 @@ export const solicitudService = {
 
   deleteSolicitudByCodigo: async (codigoSolicitud) => {
     try {
-      const solicitud = await Solicitud.findOneAndDelete({ codigoSolicitud });
+      const solicitud = await Solicitud.findOneAndUpdate(
+        { codigoSolicitud, activo: true },
+        { activo: false },
+        { new: true }
+      );
 
       if (!solicitud) {
         throw new Error(`Solicitud with codigoSolicitud ${codigoSolicitud} does not exist`);
       }
-      return { message: 'Solicitud deleted successfully' };
+      return { message: 'Solicitud disabled successfully' };
     } catch (error) {
       throw error;
     }
@@ -99,7 +103,7 @@ export const solicitudService = {
 
   getSolicitudesByCliente: async (clienteId) => {
     try {
-      const solicitudes = await Solicitud.find({ clienteId })
+      const solicitudes = await Solicitud.find({ clienteId, activo: true })
         .populate('clienteId')
         .populate('vendedorId')
         .populate('tasInteresId')
@@ -115,7 +119,7 @@ export const solicitudService = {
 
   getSolicitudesByVendedor: async (vendedorId) => {
     try {
-      const solicitudes = await Solicitud.find({ vendedorId })
+      const solicitudes = await Solicitud.find({ vendedorId, activo: true })
         .populate('clienteId')
         .populate('vendedorId')
         .populate('tasInteresId')
@@ -135,7 +139,7 @@ export const solicitudService = {
         throw new Error('Invalid estado value');
       }
 
-      const solicitudes = await Solicitud.find({ estadoSolicitud })
+      const solicitudes = await Solicitud.find({ estadoSolicitud, activo: true })
         .populate('clienteId')
         .populate('vendedorId')
         .populate('tasInteresId')
@@ -158,7 +162,7 @@ export const solicitudService = {
       }
 
       const solicitud = await Solicitud.findOneAndUpdate(
-        { codigoSolicitud },
+        { codigoSolicitud, activo: true },
         { estadoSolicitud, usuarioDecisionId, observaciones },
         { new: true, runValidators: true }
       );
@@ -196,7 +200,7 @@ export const solicitudService = {
         if (filters.fechaFin) query.fechaSolicitud.$lte = new Date(filters.fechaFin);
       }
 
-      const solicitudes = await Solicitud.find(query)
+      const solicitudes = await Solicitud.find({ ...query, activo: true })
         .populate('clienteId')
         .populate('vendedorId')
         .populate('tasInteresId')

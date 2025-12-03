@@ -17,16 +17,17 @@ const solicitudSchema = new mongoose.Schema(
     garantias: { type: [Object], default: [] },
     tablaAmortizacion: { type: [Object], default: [] },
     cuotaEstimadaComision: { type: Object, default: {} },
-    estadoSolicitud: { 
-      type: String, 
-      enum: ['REGISTRADA', 'EN_REVISIÓN', 'APROBADA', 'RECHAZADA'],
+    estadoSolicitud: {
+      type: String,
+      enum: ['REGISTRADA', 'EN_REVISION', 'APROBADA', 'RECHAZADA'],
       required: true,
-      default: 'REGISTRADA'
+      default: 'REGISTRADA',
     },
     observaciones: { type: String, default: '' },
-    usuarioCreacionId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false }, //TODO CAMBIAR A TRUE
+    usuarioCreacionId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
     usuarioDecisionId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
-  }, 
+    activo: { type: Boolean, default: true },
+  },
   { timestamps: true }
 );
 

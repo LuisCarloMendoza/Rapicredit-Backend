@@ -6,4 +6,5 @@ clienteRouter.post("/", clienteController.createCliente);
 clienteRouter.put("/:codigoCliente", clienteController.updateClienteByCodigo);
 clienteRouter.get("/", clienteController.getAllClientes);
 clienteRouter.get("/:codigoCliente", clienteController.getClienteByCodigo);
+clienteRouter.delete("/:codigoCliente", clienteController.deleteClienteByCodigo);
 export default clienteRouter;

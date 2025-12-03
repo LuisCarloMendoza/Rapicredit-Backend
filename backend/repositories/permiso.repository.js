@@ -24,6 +24,10 @@ export const permisoRepository = {
   findAllPermisos: async () => {
     return await permisoModel.find();
   },
+
+  deletePermisoByCodigo: async (codigoPermiso) => {
+    return await permisoModel.findOneAndDelete({ codigoPermiso });
+  },
 };
 import User from '../models/permiso.model.js';
 

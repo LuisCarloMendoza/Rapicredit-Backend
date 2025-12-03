@@ -28,6 +28,7 @@ const clienteSchema = new mongoose.Schema(
     estadoDeuda: {type: [String], require: true}, /// validar
     garantias: { type: [String], default: [] },
     codigoCobrador: { type: String, required: false }, //Decidir si UID o codigoUsuario ###PREGUNTAR SI REQUERIDO
+    activo: { type: Boolean, default: true },
   }, { timestamps: true }
 );
 

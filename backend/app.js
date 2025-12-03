@@ -90,6 +90,8 @@ app.use('/api/abonos', abonosRouter);
 // Endpoints de Tasas de Interés
 app.use('/api/tasas', tasasRouter);
 
+// Endpoints de Frecuencias de Pago
+app.use('/api/frecuencias', frecuenciasRouter);
 
 // Firebase Admin SDK (ESM-compatible)
 

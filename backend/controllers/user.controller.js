@@ -68,9 +68,7 @@ export const userController = {
 
   getAll: async (req, res) => {
     try {
-      const users = await User.find().select("-contraseña"); 
-      // select() oculta la contraseña por seguridad
-
+      const users = await User.find({ actividad: true }).select("-contrasea");
       res.status(200).json({
         ok: true,
         total: users.length,
@@ -82,6 +80,16 @@ export const userController = {
         msg: "Error al obtener los usuarios",
         error: error.message,
       });
+    }
+  },
+
+  deleteByCodigoUsuario: async (req, res) => {
+    try {
+      const { codigoUsuario } = req.params;
+      await userService.deleteByCodigoUsuario(codigoUsuario);
+      res.status(204).end();
+    } catch (error) {
+      res.status(400).json({ message: error.message });
     }
   }
 };

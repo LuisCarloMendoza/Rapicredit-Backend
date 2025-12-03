@@ -90,5 +90,15 @@ export const abonoController = {
     } catch (error) {
       res.status(400).json({ message: error.message });
     }
+  },
+
+  deleteByCodigo: async (req, res) => {
+    try {
+      const codigo = req.params.codigo;
+      await abonoService.deleteByCodigo(codigo);
+      res.status(204).end();
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
   }
 };

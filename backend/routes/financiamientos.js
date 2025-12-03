@@ -9,5 +9,6 @@ financiamientosRouter.get('/', financiamientoController.getAllFinanciamientos);
 financiamientosRouter.get('/:codigoFinanciamiento', financiamientoController.getFinanciamientoByCodigo);
 // Convenience: get by ObjectId
 financiamientosRouter.get('/id/:id', financiamientoController.getFinanciamientoById);
+financiamientosRouter.delete('/:codigoFinanciamiento', financiamientoController.deleteFinanciamientoByCodigo);
 
 export default financiamientosRouter;

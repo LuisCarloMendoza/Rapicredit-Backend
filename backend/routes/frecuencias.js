@@ -9,5 +9,7 @@ router.put('/id/:id', frecuenciaController.updateById);
 router.get('/', frecuenciaController.getAll);
 router.get('/codigo/:codigo', frecuenciaController.getByCodigo);
 router.get('/id/:id', frecuenciaController.getById);
+router.delete('/codigo/:codigo', frecuenciaController.deleteByCodigo);
+router.delete('/id/:id', frecuenciaController.deleteById);
 
 export default router;

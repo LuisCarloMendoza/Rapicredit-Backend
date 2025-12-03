@@ -7,15 +7,15 @@ export const financiamientoRepository = {
   },
 
   findByCodigoFinanciamiento: async (codigoFinanciamiento) => {
-    return await Financiamiento.findOne({ codigoFinanciamiento });
+    return await Financiamiento.findOne({ codigoFinanciamiento, activo: true });
   },
 
   findById: async (id) => {
-    return await Financiamiento.findById(id);
+    return await Financiamiento.findOne({ _id: id, activo: true });
   },
 
   findAllFinanciamientos: async () => {
-    return await Financiamiento.find();
+    return await Financiamiento.find({ activo: true });
   },
 
   updateFinanciamientoByCodigo: async (codigoFinanciamiento, updateData) => {
@@ -30,5 +30,13 @@ export const financiamientoRepository = {
       delete updateData.codigoFinanciamiento;
     }
     return await Financiamiento.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
+  },
+
+  deleteByCodigoFinanciamiento: async (codigoFinanciamiento) => {
+    return await Financiamiento.findOneAndUpdate(
+      { codigoFinanciamiento },
+      { activo: false },
+      { new: true }
+    );
   }
 };

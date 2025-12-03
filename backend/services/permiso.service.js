@@ -51,5 +51,12 @@ export const permisoService = {
     const permiso = await permisoRepository.findByCodigoPermiso(codigoPermiso);
     if (!permiso) throw new Error('Permiso with the provided codigoPermiso does not exist.');
     return permiso;
+  },
+
+  deletePermisoByCodigo: async (codigoPermiso) => {
+    if (!codigoPermiso) throw new Error('codigoPermiso is required for deleting permiso');
+    const existing = await permisoRepository.findByCodigoPermiso(codigoPermiso);
+    if (!existing) throw new Error('Permiso with the provided codigoPermiso does not exist.');
+    return await permisoRepository.deletePermisoByCodigo(codigoPermiso);
   }
 };

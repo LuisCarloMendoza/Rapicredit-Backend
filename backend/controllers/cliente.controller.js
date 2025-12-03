@@ -38,4 +38,14 @@ export const clienteController = {
       res.status(403).json({ message: error.message });
     }
   },
+
+  deleteClienteByCodigo: async (req, res) => {
+    try {
+      const codigoCliente = req.params.codigoCliente;
+      await clienteService.deleteClienteByCodigo(codigoCliente);
+      res.status(204).end();
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  },
 };

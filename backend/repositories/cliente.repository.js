@@ -6,7 +6,7 @@ export const clienteRepository = {
     return await newCliente.save();
   },
   findByCodigoCliente: async (codigoCliente) => {
-    return await clienteModel.findOne({ codigoCliente });
+    return await clienteModel.findOne({ codigoCliente, activo: true });
   },
   updateClienteByCodigo: async (codigoCliente, updateData) => {
     // Prevent changing the immutable codigoCliente field from the update payload
@@ -22,6 +22,14 @@ export const clienteRepository = {
     );
   },
   findAllClientes: async () => {
-    return await clienteModel.find();
+    return await clienteModel.find({ activo: true });
+  },
+
+  deleteClienteByCodigo: async (codigoCliente) => {
+    return await clienteModel.findOneAndUpdate(
+      { codigoCliente },
+      { activo: false },
+      { new: true }
+    );
   },
 };

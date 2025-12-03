@@ -13,6 +13,7 @@ router.get('/', abonoController.getAll);
 // update by codigoAbono
 router.put('/codigo/:codigo', abonoController.updateByCodigo);
 router.put('/:id', abonoController.updateById);
+router.delete('/codigo/:codigo', abonoController.deleteByCodigo);
 router.delete('/:id', abonoController.deleteById);
 
 export default router;

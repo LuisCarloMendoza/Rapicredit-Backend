@@ -93,5 +93,15 @@ export const clienteService = {
       throw new Error("Cliente with the provided codigoCliente does not exist.");
     }
     return cliente;
+  },
+
+  deleteClienteByCodigo: async (codigoCliente) => {
+    if (!codigoCliente) throw new Error("codigoCliente is required for deleting cliente.");
+    const existingCliente = await clienteRepository.findByCodigoCliente(codigoCliente);
+    if (!existingCliente) {
+      throw new Error("Cliente with the provided codigoCliente does not exist.");
+    }
+    await clienteRepository.deleteClienteByCodigo(codigoCliente);
+    return { message: 'Cliente disabled successfully' };
   }
 };

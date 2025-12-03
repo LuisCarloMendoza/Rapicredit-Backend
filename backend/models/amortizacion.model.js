@@ -12,6 +12,7 @@ const amortizacionSchema = new Schema(
     saldoCapital: { type: Number, required: true },
     pagado: { type: Boolean, required: true, default: false },
     orden: { type: Number, required: false },
+    activo: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

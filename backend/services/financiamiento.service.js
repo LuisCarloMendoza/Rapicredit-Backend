@@ -69,5 +69,12 @@ export const financiamientoService = {
     const item = await financiamientoRepository.findById(id);
     if (!item) throw new Error('Financiamiento with the provided id does not exist.');
     return item;
+  },
+
+  deleteFinanciamientoByCodigo: async (codigoFinanciamiento) => {
+    if (!codigoFinanciamiento) throw new Error('codigoFinanciamiento is required for deleting financiamiento.');
+    const existing = await financiamientoRepository.findByCodigoFinanciamiento(codigoFinanciamiento);
+    if (!existing) throw new Error('Financiamiento with the provided codigoFinanciamiento does not exist.');
+    return await financiamientoRepository.deleteByCodigoFinanciamiento(codigoFinanciamiento);
   }
 };

@@ -60,5 +60,25 @@ export const frecuenciaController = {
     } catch (error) {
       res.status(404).json({ message: error.message });
     }
+  },
+
+  deleteByCodigo: async (req, res) => {
+    try {
+      const codigo = req.params.codigo;
+      await frecuenciaService.deleteByCodigo(codigo);
+      res.status(204).end();
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  },
+
+  deleteById: async (req, res) => {
+    try {
+      const id = req.params.id;
+      await frecuenciaService.deleteById(id);
+      res.status(204).end();
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
   }
 };

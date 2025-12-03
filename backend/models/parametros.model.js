@@ -11,6 +11,7 @@ const parametrosSchema = new mongoose.Schema(
         limitePrestamoMax: { type: Number, required: true, default: 0 },
         politicaMora: { type: String, required: false, default: "" }, // descripción de la política de mora
         configCAI: { type: [String], default: [] }, 
+        activo: { type: Boolean, default: true },
     },
     { timestamps: true }
 );

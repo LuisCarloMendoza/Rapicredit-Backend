@@ -148,4 +148,15 @@ export const userService = {
     );
     return updatedUser;
   },
+
+  deleteByCodigoUsuario: async (codigoUsuario) => {
+    if (!codigoUsuario) {
+      throw new Error("codigoUsuario is required for deleting user");
+    }
+    const existe = await userRepository.findByCodigoUsuario(codigoUsuario);
+    if (!existe) {
+      throw new Error("User with the provided codigoUsuario does not exist");
+    }
+    return await userRepository.deleteByCodigoUsuario(codigoUsuario);
+  },
 };

@@ -58,5 +58,19 @@ export const frecuenciaService = {
     const item = await frecuenciaRepository.findById(id);
     if (!item) throw new Error('Frecuencia with the provided id does not exist.');
     return item;
+  },
+
+  deleteByCodigo: async (codigo) => {
+    if (!codigo) throw new Error('codigoFrecuenciaPagos is required for deleting frecuencia');
+    const existing = await frecuenciaRepository.findByCodigo(codigo);
+    if (!existing) throw new Error('Frecuencia with the provided codigo does not exist.');
+    return await frecuenciaRepository.deleteByCodigo(codigo);
+  },
+
+  deleteById: async (id) => {
+    if (!id) throw new Error('id is required for deleting frecuencia');
+    const existing = await frecuenciaRepository.findById(id);
+    if (!existing) throw new Error('Frecuencia with the provided id does not exist.');
+    return await frecuenciaRepository.deleteById(id);
   }
 };

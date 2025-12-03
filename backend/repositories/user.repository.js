@@ -28,6 +28,14 @@ export const userRepository = {
     
     findByEmail: async (email) => {
         return await User.findOne({ email });
+    },
+
+    deleteByCodigoUsuario: async (codigoUsuario) => {
+        return await User.findOneAndUpdate(
+            { codigoUsuario },
+            { actividad: false },
+            { new: true }
+        );
     }
 
 }

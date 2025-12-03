@@ -7,15 +7,15 @@ export const frecuenciaRepository = {
   },
 
   findByCodigo: async (codigo) => {
-    return await FrecuenciaPago.findOne({ codigoFrecuenciaPagos: codigo });
+    return await FrecuenciaPago.findOne({ codigoFrecuenciaPagos: codigo, activa: true });
   },
 
   findById: async (id) => {
-    return await FrecuenciaPago.findById(id);
+    return await FrecuenciaPago.findOne({ _id: id, activa: true });
   },
 
   findAll: async () => {
-    return await FrecuenciaPago.find();
+    return await FrecuenciaPago.find({ activa: true });
   },
 
   updateByCodigo: async (codigo, updateData) => {
@@ -26,5 +26,17 @@ export const frecuenciaRepository = {
   updateById: async (id, updateData) => {
     if (updateData && Object.prototype.hasOwnProperty.call(updateData, 'codigoFrecuenciaPagos')) delete updateData.codigoFrecuenciaPagos;
     return await FrecuenciaPago.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
+  },
+
+  deleteByCodigo: async (codigo) => {
+    return await FrecuenciaPago.findOneAndUpdate(
+      { codigoFrecuenciaPagos: codigo },
+      { activa: false },
+      { new: true }
+    );
+  },
+
+  deleteById: async (id) => {
+    return await FrecuenciaPago.findByIdAndUpdate(id, { activa: false }, { new: true });
   }
 };

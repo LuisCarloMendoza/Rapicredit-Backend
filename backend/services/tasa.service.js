@@ -84,5 +84,12 @@ export const tasaService = {
     const item = await tasaRepository.findById(id);
     if (!item) throw new Error('Tasa with the provided id does not exist.');
     return item;
+  },
+
+  deleteByCodigo: async (codigoTasa) => {
+    if (!codigoTasa) throw new Error('codigoTasa is required for deleting tasa');
+    const existing = await tasaRepository.findByCodigo(codigoTasa);
+    if (!existing) throw new Error('Tasa with the provided codigoTasa does not exist.');
+    return await tasaRepository.deleteByCodigo(codigoTasa);
   }
 };

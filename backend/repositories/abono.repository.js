@@ -7,23 +7,23 @@ export const abonoRepository = {
   },
 
   findById: async (id) => {
-    return await Abono.findById(id);
+    return await Abono.findOne({ _id: id, activo: true });
   },
 
   findByCodigoAbono: async (codigoAbono) => {
-    return await Abono.findOne({ codigoAbono });
+    return await Abono.findOne({ codigoAbono, activo: true });
   },
 
   findByFinanciamientoId: async (financiamientoId) => {
-    return await Abono.find({ financiamientoId }).sort({ fechaAbono: -1 });
+    return await Abono.find({ financiamientoId, activo: true }).sort({ fechaAbono: -1 });
   },
 
   findByClienteId: async (clienteId) => {
-    return await Abono.find({ clienteId }).sort({ fechaAbono: -1 });
+    return await Abono.find({ clienteId, activo: true }).sort({ fechaAbono: -1 });
   },
 
   findAllAbonos: async () => {
-    return await Abono.find();
+    return await Abono.find({ activo: true });
   },
 
   updateById: async (id, updateData) => {
@@ -36,6 +36,14 @@ export const abonoRepository = {
   },
 
   deleteById: async (id) => {
-    return await Abono.findByIdAndDelete(id);
+    return await Abono.findByIdAndUpdate(id, { activo: false }, { new: true });
+  },
+
+  deleteByCodigoAbono: async (codigoAbono) => {
+    return await Abono.findOneAndUpdate(
+      { codigoAbono },
+      { activo: false },
+      { new: true }
+    );
   }
 };

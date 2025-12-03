@@ -40,4 +40,14 @@ export const permisoController = {
       res.status(403).json({ message: error.message });
     }
   },
+
+  deletePermisoByCodigo: async (req, res) => {
+    try {
+      const codigoPermiso = req.params.codigoPermiso;
+      await permisoService.deletePermisoByCodigo(codigoPermiso);
+      res.status(204).end();
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  },
 };

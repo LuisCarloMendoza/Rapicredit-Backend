@@ -7,7 +7,7 @@ export const parametrosRepository = {
   },
 
   findByCodigoParametros: async (codigoParametros) => {
-    return await Parametros.findOne({ codigoParametros });
+    return await Parametros.findOne({ codigoParametros, activo: true });
   },
 
   updateParametrosByCodigo: async (codigoParametros, updateData) => {
@@ -18,6 +18,14 @@ export const parametrosRepository = {
   },
 
   findAllParametros: async () => {
-    return await Parametros.find();
+    return await Parametros.find({ activo: true });
+  },
+
+  deleteParametrosByCodigo: async (codigoParametros) => {
+    return await Parametros.findOneAndUpdate(
+      { codigoParametros },
+      { activo: false },
+      { new: true }
+    );
   },
 };

@@ -49,5 +49,15 @@ export const financiamientoController = {
     } catch (error) {
       res.status(403).json({ message: error.message });
     }
+  },
+
+  deleteFinanciamientoByCodigo: async (req, res) => {
+    try {
+      const codigoFinanciamiento = req.params.codigoFinanciamiento;
+      await financiamientoService.deleteFinanciamientoByCodigo(codigoFinanciamiento);
+      res.status(204).end();
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
   }
 };

@@ -11,5 +11,6 @@ router.get('/', tasaController.getAll);
 router.get('/codigo/:codigo', tasaController.getByCodigo);
 router.get('/id/:id', tasaController.getById);
 router.get('/:nombre', tasaController.getByNombre);
+router.delete('/codigo/:codigo', tasaController.deleteByCodigo);
 
 export default router;

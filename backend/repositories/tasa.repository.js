@@ -7,19 +7,19 @@ export const tasaRepository = {
   },
 
   findByNombre: async (nombre) => {
-    return await TasaInteres.findOne({ nombre });
+    return await TasaInteres.findOne({ nombre, activa: true });
   },
 
   findByCodigo: async (codigoTasa) => {
-    return await TasaInteres.findOne({ codigoTasa });
+    return await TasaInteres.findOne({ codigoTasa, activa: true });
   },
 
   findById: async (id) => {
-    return await TasaInteres.findById(id);
+    return await TasaInteres.findOne({ _id: id, activa: true });
   },
 
   findAll: async () => {
-    return await TasaInteres.find();
+    return await TasaInteres.find({ activa: true });
   },
 
   updateByNombre: async (nombre, updateData) => {
@@ -39,5 +39,13 @@ export const tasaRepository = {
       delete updateData.nombre;
     }
     return await TasaInteres.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
+  },
+
+  deleteByCodigo: async (codigoTasa) => {
+    return await TasaInteres.findOneAndUpdate(
+      { codigoTasa },
+      { activa: false },
+      { new: true }
+    );
   }
 };

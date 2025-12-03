@@ -7,5 +7,6 @@ parametrosRouter.post('/', parametrosController.createParametros);
 parametrosRouter.put('/:codigoParametros', parametrosController.updateParametrosByCodigo);
 parametrosRouter.get('/', parametrosController.getAllParametros);
 parametrosRouter.get('/:codigoParametros', parametrosController.getParametrosByCodigo);
+parametrosRouter.delete('/:codigoParametros', parametrosController.deleteParametrosByCodigo);
 
 export default parametrosRouter;
