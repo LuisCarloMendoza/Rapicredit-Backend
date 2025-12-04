@@ -1,4 +1,6 @@
 import { clienteRepository } from "../repositories/cliente.repository.js";
+import { financiamientoRepository } from "../repositories/financiamiento.repository.js";
+import { abonoRepository } from "../repositories/abono.repository.js";
 
 export const clienteService = {
   // --- Validation helpers ---
@@ -94,6 +96,73 @@ export const clienteService = {
     }
     return cliente;
   },
+
+  // ==== NUEVO: resumen de clientes para el frontend ====
+  getClientesResumen: async () => {
+    // 1) Traemos todos los clientes activos (o todos, según tu lógica)
+    const clientes = await clienteRepository.findAllClientes();
+
+    if (!clientes || clientes.length === 0) {
+      return [];
+    }
+
+    // Lista de IDs de clientes
+    const clienteIds = clientes.map((c) => c._id);
+
+    // 2) Traemos todos los financiamientos de esos clientes
+    const financiamientos = await financiamientoRepository.findByClienteIds(clienteIds);
+
+    // 3) Traemos todos los abonos de esos clientes (ordenados desc por fecha)
+    const abonos = await abonoRepository.findByClienteIds(clienteIds);
+
+    // Mapas para acumular info por cliente
+    const mapaPrestamos = new Map();   // {clienteId: {activos, tieneMora}}
+    const mapaUltimoAbono = new Map(); // {clienteId: fechaAbono}
+
+    // Procesamos financiamientos
+    for (const f of financiamientos) {
+      const idCliente = String(f.clienteId);
+      if (!mapaPrestamos.has(idCliente)) {
+        mapaPrestamos.set(idCliente, { activos: 0, tieneMora: false });
+      }
+      const info = mapaPrestamos.get(idCliente);
+      info.activos += 1;
+
+      if (f.estadoFinanciamiento === 'EN_MORA') {
+        info.tieneMora = true;
+      }
+    }
+
+    // Procesamos abonos (como vienen ordenados desc, el primero que veamos es el último)
+    for (const a of abonos) {
+      const idCliente = String(a.clienteId);
+      if (!mapaUltimoAbono.has(idCliente)) {
+        mapaUltimoAbono.set(idCliente, a.fechaAbono);
+      }
+    }
+
+    // Armamos el resumen final por cliente
+    const resumen = clientes.map((c) => {
+      const idCliente = String(c._id);
+
+      const infoPrestamos = mapaPrestamos.get(idCliente) || {
+        activos: 0,
+        tieneMora: false,
+      };
+
+      const ultimoMovimiento = mapaUltimoAbono.get(idCliente) || null;
+
+      return {
+        cliente: c, // objeto cliente completo tal como viene de la BD
+        prestamosActivos: infoPrestamos.activos,
+        tieneMora: infoPrestamos.tieneMora,
+        ultimoMovimiento,
+      };
+    });
+
+    return resumen;
+  },
+
 
   deleteClienteByCodigo: async (codigoCliente) => {
     if (!codigoCliente) throw new Error("codigoCliente is required for deleting cliente.");

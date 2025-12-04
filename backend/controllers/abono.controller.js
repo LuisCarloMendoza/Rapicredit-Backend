@@ -82,6 +82,30 @@ export const abonoController = {
     }
   },
 
+  // ==== NUEVO: GET /api/abonos/hoy ====
+  getAbonosHoy: async (req, res) => {
+    try {
+      const abonos = await abonoService.getAbonosHoy();
+      res.status(200).json(abonos);
+    } catch (error) {
+      console.error("Error en getAbonosHoy:", error);
+      res.status(500).json({ message: "Error al obtener abonos de hoy" });
+    }
+  },
+
+  // ==== NUEVO: GET /api/abonos/rango?desde=YYYY-MM-DD&hasta=YYYY-MM-DD ====
+  getAbonosPorRango: async (req, res) => {
+    try {
+      const { desde, hasta } = req.query;
+      const abonos = await abonoService.getAbonosPorRango(desde, hasta);
+      res.status(200).json(abonos);
+    } catch (error) {
+      console.error("Error en getAbonosPorRango:", error);
+      res.status(500).json({ message: "Error al obtener abonos por rango de fechas" });
+    }
+  },
+
+
   deleteById: async (req, res) => {
     try {
       const id = req.params.id;

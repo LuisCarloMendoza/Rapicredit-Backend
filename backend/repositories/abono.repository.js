@@ -39,6 +39,36 @@ export const abonoRepository = {
     return await Abono.findByIdAndUpdate(id, { activo: false }, { new: true });
   },
 
+  // ==== NUEVO MÉTODO PARA DASHBOARD (PAGOS DEL DÍA) ====
+
+  findByFechaRango: async (desde, hasta) => {
+    const filtro = { activo: true };
+    if (desde || hasta) {
+      filtro.fechaAbono = {};
+      if (desde) filtro.fechaAbono.$gte = desde;
+      if (hasta) filtro.fechaAbono.$lte = hasta;
+    }
+
+    return await Abono.find(filtro)
+      .sort({ fechaAbono: -1 })
+      .populate('financiamientoId', 'codigoFinanciamiento')
+      .populate('clienteId', 'codigoCliente identidadCliente')
+      .lean();
+  },
+
+  // ==== NUEVO MÉTODO: abonos por lista de clientes, ordenados por fecha desc ====
+  findByClienteIds: async (clienteIds = []) => {
+    if (!clienteIds || clienteIds.length === 0) return [];
+
+    return await Abono.find({
+      activo: true,
+      clienteId: { $in: clienteIds },
+    })
+      .sort({ fechaAbono: -1 }) // primero los más recientes
+      .lean();
+  },
+
+
   deleteByCodigoAbono: async (codigoAbono) => {
     return await Abono.findOneAndUpdate(
       { codigoAbono },

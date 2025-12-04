@@ -55,9 +55,10 @@ export const financiamientoService = {
     return updated;
   },
 
-  getAllFinanciamientos: async () => {
-    return await financiamientoRepository.findAllFinanciamientos();
+    getAllFinanciamientos: async (filtros) => {
+    return await financiamientoRepository.findAllFinanciamientos(filtros);
   },
+
 
   getFinanciamientoByCodigo: async (codigoFinanciamiento) => {
     const item = await financiamientoRepository.findByCodigoFinanciamiento(codigoFinanciamiento);

@@ -1,4 +1,5 @@
-import { abonoRepository } from '../repositories/abono.repository.js';
+import { abonoRepository } from "../repositories/abono.repository.js";
+import { financiamientoRepository } from "../repositories/financiamiento.repository.js";
 
 export const abonoService = {
   _isValidDate: (d) => {
@@ -34,16 +35,43 @@ export const abonoService = {
     });
   },
 
+  // ==== REGISTRAR PAGO / ABONO CON ACTUALIZACIÓN DE SALDO ====
   createAbono: async (data) => {
-    abonoService._validateCreateData(data);
-    // ensure codigoAbono uniqueness
-    const existing = await abonoRepository.findByCodigoAbono(data.codigoAbono);
-    if (existing) throw new Error('An abono with this codigoAbono already exists.');
-    // NOTE: business rules (applying amounts to amortization records, updating financiamiento.saldoCapital, etc.)
-    // should be implemented here in the future. Right now we only persist the abono.
-    const created = await abonoRepository.createAbono(data);
-    return created;
+    // 1) Crear el abono normalmente
+    const nuevoAbono = await abonoRepository.createAbono(data);
+
+    // 2) Si está vinculado a un financiamiento, actualizamos su saldo
+    if (nuevoAbono && nuevoAbono.financiamientoId && nuevoAbono.montoAbono) {
+      const financiamiento = await financiamientoRepository.findById(nuevoAbono.financiamientoId);
+
+      if (financiamiento) {
+        const saldoActual =
+          financiamiento.saldoCapital != null
+            ? financiamiento.saldoCapital
+            : financiamiento.capitalInicial || 0;
+
+        const montoAbono = Number(nuevoAbono.montoAbono) || 0;
+
+        let nuevoSaldo = saldoActual - montoAbono;
+        if (nuevoSaldo < 0) nuevoSaldo = 0;
+
+        let nuevoEstado = financiamiento.estadoFinanciamiento;
+
+        // Regla simple: si el saldo llega a 0 -> marcado como PAGADO
+        if (nuevoSaldo === 0) {
+          nuevoEstado = "PAGADO";
+        }
+
+        await financiamientoRepository.updateFinanciamientoById(financiamiento._id, {
+          saldoCapital: nuevoSaldo,
+          estadoFinanciamiento: nuevoEstado,
+        });
+      }
+    }
+
+    return nuevoAbono;
   },
+
 
   getByFinanciamientoId: async (financiamientoId) => {
     return await abonoRepository.findByFinanciamientoId(financiamientoId);
@@ -83,6 +111,32 @@ export const abonoService = {
     const updated = await abonoRepository.updateByCodigoAbono(codigoAbono, updateData);
     return updated;
   },
+
+  // ==== NUEVO: obtener abonos por rango de fechas ====
+  getAbonosPorRango: async (desde, hasta) => {
+    // 'desde' y 'hasta' vienen como strings tipo '2025-12-04' o '2025-12-04T00:00:00'
+    let fechaDesde = null;
+    let fechaHasta = null;
+
+    if (desde) {
+      fechaDesde = new Date(desde);
+    }
+    if (hasta) {
+      fechaHasta = new Date(hasta);
+    }
+
+    return await abonoRepository.findByFechaRango(fechaDesde, fechaHasta);
+  },
+
+  // ==== NUEVO: obtener abonos de HOY ====
+  getAbonosHoy: async () => {
+    const ahora = new Date();
+    const inicioHoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+    const finHoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate() + 1);
+
+    return await abonoRepository.findByFechaRango(inicioHoy, finHoy);
+  },
+
 
   deleteById: async (id) => {
     return await abonoRepository.deleteById(id);

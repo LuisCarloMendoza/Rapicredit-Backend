@@ -22,14 +22,24 @@ export const financiamientoController = {
     }
   },
 
-  getAllFinanciamientos: async (req, res) => {
+    getAllFinanciamientos: async (req, res) => {
     try {
-      const list = await financiamientoService.getAllFinanciamientos();
+      const filtros = {
+        // /api/financiamientos?estado=VIGENTE
+        estado: req.query.estado || null,
+        // /api/financiamientos?busqueda=0801...
+        busqueda: req.query.busqueda || null,
+        // /api/financiamientos?ordenarPor=MONTO_MAYOR
+        ordenarPor: req.query.ordenarPor || null,
+      };
+
+      const list = await financiamientoService.getAllFinanciamientos(filtros);
       res.status(200).json(list);
     } catch (error) {
       res.status(403).json({ message: error.message });
     }
   },
+
 
   getFinanciamientoByCodigo: async (req, res) => {
     try {

@@ -19,6 +19,15 @@ import abonosRouter from "./routes/abonos.js";
 import tasasRouter from "./routes/tasas.js";
 import frecuenciasRouter from "./routes/frecuencias.js";
 import cors from 'cors'; //CORS
+import dashboardRouter from "./routes/dashboard.js";
+import reportesRouter from "./routes/reportes.js";
+
+import { verifyFirebaseToken } from "./middleware/verifyFirebaseToken.js";
+import { requireRole } from "./middleware/requireRole.js";
+import { requirePermiso } from "./middleware/requirePermiso.js";
+
+
+
 dotenv.config();
 
 const app = express();
@@ -66,6 +75,7 @@ app.get('/', (req, res) => {
 app.use('/api/users', userRouter);
 //Endpoints de Clientes
 app.use('/api/clientes', clienteRouter);
+
 // Endpoints de Permisos
 app.use('/api/permisos', permisoRouter);
 
@@ -92,6 +102,28 @@ app.use('/api/tasas', tasasRouter);
 
 // Endpoints de Frecuencias de Pago
 app.use('/api/frecuencias', frecuenciasRouter);
+
+// Endpoints de Dashboard
+app.use('/api/dashboard', dashboardRouter);
+
+app.use('/api/reportes', reportesRouter);
+
+
+/** 
+// A partir de aquí, todo requiere Firebase token
+app.use('/api/clientes', verifyFirebaseToken, clienteRouter);
+app.use('/api/permisos', verifyFirebaseToken, permisoRouter);
+app.use('/api/financiamientos', verifyFirebaseToken, financiamientosRouter);
+app.use('/api/amortizaciones', verifyFirebaseToken, amortizacionesRouter);
+app.use('/api/parametros', verifyFirebaseToken, parametrosRouter);
+app.use('/api/solicitudes', verifyFirebaseToken, solicitudesRouter);
+app.use('/api/gastos', verifyFirebaseToken, gastosRouter);
+app.use('/api/abonos', verifyFirebaseToken, abonosRouter);
+app.use('/api/tasas', verifyFirebaseToken, tasasRouter);
+app.use('/api/frecuencias', verifyFirebaseToken, frecuenciasRouter);
+app.use('/api/dashboard', verifyFirebaseToken, dashboardRouter);
+app.use('/api/reportes', verifyFirebaseToken, reportesRouter);
+*/
 
 // Firebase Admin SDK (ESM-compatible)
 
