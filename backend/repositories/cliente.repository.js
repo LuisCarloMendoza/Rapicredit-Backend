@@ -22,7 +22,7 @@ export const clienteRepository = {
     );
   },
   findAllClientes: async () => {
-    return await clienteModel.find({ activo: true });
+    return await clienteModel.find();
   },
 
   deleteClienteByCodigo: async (codigoCliente) => {
