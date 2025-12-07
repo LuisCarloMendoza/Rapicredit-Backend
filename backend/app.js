@@ -19,9 +19,9 @@ import abonosRouter from "./routes/abonos.js";
 import tasasRouter from "./routes/tasas.js";
 import frecuenciasRouter from "./routes/frecuencias.js";
 import cors from 'cors'; //CORS
+
 import dashboardRouter from "./routes/dashboard.js";
 import reportesRouter from "./routes/reportes.js";
-
 import { verifyFirebaseToken } from "./middleware/verifyFirebaseToken.js";
 import { requireRole } from "./middleware/requireRole.js";
 import { requirePermiso } from "./middleware/requirePermiso.js";

@@ -1,6 +1,7 @@
 import express from "express";
 import { userController } from "../controllers/user.controller.js";
 import { verifyFirebaseToken } from "../middleware/verifyFirebaseToken.js";
+import { requireRole } from "../middleware/requireRole.js";
 
 const userRouter = express.Router();
 

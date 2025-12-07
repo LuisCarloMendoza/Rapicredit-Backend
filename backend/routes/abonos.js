@@ -17,10 +17,10 @@ router.delete('/codigo/:codigo', abonoController.deleteByCodigo);
 router.delete('/:id', abonoController.deleteById);
 
 // Abonos de hoy
-abonosRouter.get('/hoy', abonoController.getAbonosHoy);
+router.get('/hoy', abonoController.getAbonosHoy);
 
 // Abonos por rango de fechas ?desde=YYYY-MM-DD&hasta=YYYY-MM-DD
-abonosRouter.get('/rango', abonoController.getAbonosPorRango);
+router.get('/rango', abonoController.getAbonosPorRango);
 
 
 export default router;
