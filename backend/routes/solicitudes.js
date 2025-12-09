@@ -23,7 +23,6 @@ router.get('/report/approved', solicitudController.generateApprovedReport);
 router.get('/', solicitudController.filterSolicitudes); // Con query params para filtros
 router.get('/:codigoSolicitud', solicitudController.getSolicitudByCodigo);
 
-// Cambio de estado
 router.patch('/:codigoSolicitud/status', solicitudController.changeSolicitudStatus);
 
 export default router;
