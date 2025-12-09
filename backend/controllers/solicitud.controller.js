@@ -1,5 +1,6 @@
 import { solicitudService } from '../services/solicitud.service.js';
 import Solicitud from '../models/solicitud.model.js'; 
+import { generarPdfSolicitud } from '../services/solicitudPDF.service.js';
 
 const getSolicitudRawByCodigo = async (codigoSolicitud) => {
   const solicitud = await Solicitud.findOne({ codigoSolicitud })
@@ -117,6 +118,43 @@ export const solicitudController = {
     }
   },
 
+  generateApprovedReport: async (req, res) => {
+    try {
+      // Accept parameters from query or body: { frequency: 'weekly'|'monthly'|'quarterly'|'yearly', from: 'YYYY-MM-DD', to: 'YYYY-MM-DD' }
+      const params = { ...req.query, ...req.body };
+      const { frequency = 'monthly', from, to } = params || {};
+      const { solicitudReportService } = await import('../services/solicitudReport.service.js');
+      const buffer = await solicitudReportService.generateApprovedSolicitudesWorkbook({ frequency, from, to });
+
+      const fromLabel = from ? String(from).replace(/:/g,'') : 'any';
+      const toLabel = to ? String(to).replace(/:/g,'') : 'any';
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename="solicitudes_aprobadas_${frequency}_${fromLabel}_${toLabel}.xlsx"`);
+      res.status(200).send(Buffer.from(buffer));
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+
   //Exponer el helper para que el router pueda usarlo en la generación del PDF
   getSolicitudRawByCodigo,
+
+  exportPdfByCodigo: async (req, res) => {
+    try {
+      const codigoSolicitud = req.params.codigoSolicitud;
+      const raw = await getSolicitudRawByCodigo(codigoSolicitud);
+      if (!raw) return res.status(404).json({ message: 'Solicitud no encontrada' });
+
+      const { cliente, vendedor } = raw;
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename=solicitud_${codigoSolicitud}.pdf`);
+
+      const pdfDoc = generarPdfSolicitud(raw, cliente, vendedor);
+      pdfDoc.pipe(res);
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      res.status(500).json({ message: 'Error generating PDF' });
+    }
+  },
 };
