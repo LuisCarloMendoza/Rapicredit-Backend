@@ -17,7 +17,6 @@ import solicitudesRouter from "./routes/solicitudes.js";
 import gastosRouter from "./routes/gasto.js";
 import abonosRouter from "./routes/abonos.js";
 import tasasRouter from "./routes/tasas.js";
-import frecuenciasRouter from "./routes/frecuencias.js";
 import cors from 'cors'; //CORS
 
 import dashboardRouter from "./routes/dashboard.js";
@@ -32,8 +31,16 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors()); //Habilitar CORS para todas las rutas
 const port = process.env.PORT || 3001;
+
+const allowedOrigin = process.env.CORS_ORIGIN || "http://localhost:3000";
+
+app.use(
+  cors({
+    origin: allowedOrigin,
+    credentials: true,
+  }),
+);
 
 // ---- MongoDB Client ----
 const client = new MongoClient(process.env.MONGODB_URI, {
@@ -70,7 +77,7 @@ async function connect() {
 app.get('/', (req, res) => {
   res.send('Server is running!');
 });
-
+/*
 //Endpoints de Usuarios
 app.use('/api/users', userRouter);
 //Endpoints de Clientes
@@ -107,10 +114,11 @@ app.use('/api/frecuencias', frecuenciasRouter);
 app.use('/api/dashboard', dashboardRouter);
 
 app.use('/api/reportes', reportesRouter);
+*/
 
 
-/** 
 // A partir de aquí, todo requiere Firebase token
+app.use('/api/users', verifyFirebaseToken, userRouter);
 app.use('/api/clientes', verifyFirebaseToken, clienteRouter);
 app.use('/api/permisos', verifyFirebaseToken, permisoRouter);
 app.use('/api/financiamientos', verifyFirebaseToken, financiamientosRouter);
@@ -120,10 +128,9 @@ app.use('/api/solicitudes', verifyFirebaseToken, solicitudesRouter);
 app.use('/api/gastos', verifyFirebaseToken, gastosRouter);
 app.use('/api/abonos', verifyFirebaseToken, abonosRouter);
 app.use('/api/tasas', verifyFirebaseToken, tasasRouter);
-app.use('/api/frecuencias', verifyFirebaseToken, frecuenciasRouter);
 app.use('/api/dashboard', verifyFirebaseToken, dashboardRouter);
 app.use('/api/reportes', verifyFirebaseToken, reportesRouter);
-*/
+
 
 // Firebase Admin SDK (ESM-compatible)
 

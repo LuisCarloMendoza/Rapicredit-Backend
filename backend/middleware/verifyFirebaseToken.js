@@ -1,7 +1,19 @@
-import { admin } from '../firebase.js';
-import { userService } from '../services/user.service.js';
+import { admin } from '../firebase.js';         // asumiendo que así importas firebase admin
+import { userService } from '../services/user.service.js'; // si tienes esto
 
 export async function verifyFirebaseToken(req, res, next) {
+  // 🔧 MODO DESARROLLO: si está activado, no validamos nada
+  if (process.env.DISABLE_AUTH === 'true') {
+    // Si quieres, puedes simular un usuario:
+    req.currentUser = {
+      id: 'dev-user',
+      nombre: 'Usuario Dev',
+      permisos: ['Gestionar clientes', 'Ver/Buscar cliente', 'Gestionar préstamos', 'Ver/Buscar solicitud'],
+    };
+    return next();
+  }
+
+  // 🔐 MODO REAL (para cuando el login funcione de verdad)
   try {
     const header = req.headers.authorization;
     if (!header || !header.startsWith('Bearer ')) {
@@ -9,26 +21,17 @@ export async function verifyFirebaseToken(req, res, next) {
     }
 
     const token = header.split(' ')[1];
-
-    // 1) Verificamos el token con Firebase
     const decodedToken = await admin.auth().verifyIdToken(token);
 
-    // 2) Buscamos el usuario en nuestra BD por uid
-    const dbUser = await userService.getUserByUid(decodedToken.uid);
-
-    if (!dbUser) {
-      return res.status(401).json({
-        message: 'Unauthorized: User not found in database',
-      });
+    const user = await userService.getUserByFirebaseUid(decodedToken.uid);
+    if (!user) {
+      return res.status(401).json({ message: 'Unauthorized: User not found' });
     }
 
-    // 3) Adjuntamos ambos al request
-    req.firebaseUser = decodedToken;
-    req.currentUser = dbUser; // contiene rol, permisos, etc.
-
+    req.currentUser = user;
     next();
   } catch (error) {
-    console.error('Error verifying Firebase token:', error);
-    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+    console.error('Error verifying Firebase token', error);
+    res.status(401).json({ message: 'Unauthorized' });
   }
 }

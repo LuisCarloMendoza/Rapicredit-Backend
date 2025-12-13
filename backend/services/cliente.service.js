@@ -1,176 +1,414 @@
+// services/cliente.service.js
 import { clienteRepository } from "../repositories/cliente.repository.js";
-import { financiamientoRepository } from "../repositories/financiamiento.repository.js";
-import { abonoRepository } from "../repositories/abono.repository.js";
+
+
 
 export const clienteService = {
-  // --- Validation helpers ---
+  // ---------- Helpers básicos ----------
+
   _isValidEmail: (email) => {
-    if (typeof email !== 'string') return false;
-    // simple email regex
+    if (typeof email !== "string") return false;
     return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
   },
 
   _isValidDate: (d) => {
-    if (d === null || d === undefined || d === '') return false;
+    if (d === null || d === undefined || d === "") return false;
     const date = new Date(d);
     return !Number.isNaN(date.getTime());
   },
 
+  _toNumberOrNull: (value) => {
+    if (value === null || value === undefined || value === "") return null;
+    const n = Number(value);
+    return Number.isNaN(n) ? null : n;
+  },
+
+  _ensureStringArray: (value) => {
+    if (!value) return [];
+    if (Array.isArray(value)) {
+      return value
+        .map((v) => (v == null ? "" : String(v)))
+        .filter((v) => v.trim() !== "");
+    }
+    // Si viene como string separado por comas
+    return String(value)
+      .split(",")
+      .map((v) => v.trim())
+      .filter((v) => v !== "");
+  },
+
+  // ---------- Normalización de payloads ----------
+
+  /**
+   * Normaliza el payload de creación proveniente del frontend
+   * (strings en inputs) al shape/tipos que espera el schema de Mongoose.
+   */
+  _normalizeCreateData: (data) => {
+    const normalized = { ...data };
+
+    // Asegurar arrays de string
+    normalized.telefono = clienteService._ensureStringArray(data.telefono);
+    normalized.referencias = clienteService._ensureStringArray(
+      data.referencias,
+    );
+    normalized.garantias = clienteService._ensureStringArray(data.garantias);
+
+    // NUEVO: fotosDocs
+    normalized.fotosDocs = clienteService._ensureStringArray(
+      data.fotosDocs,
+    );
+
+    // Números
+    normalized.antiguedadVivenda =
+      clienteService._toNumberOrNull(data.antiguedadVivenda) ?? 0;
+    normalized.limiteCredito =
+      clienteService._toNumberOrNull(data.limiteCredito) ?? 0;
+    normalized.tasaCliente =
+      clienteService._toNumberOrNull(data.tasaCliente) ?? 0;
+
+    // Fechas
+    if (data.fechaNacimiento && clienteService._isValidDate(data.fechaNacimiento)) {
+      normalized.fechaNacimiento = new Date(data.fechaNacimiento);
+    }
+
+    // 🔁 Compatibilidad: si viene estadoDeuda desde el front viejo, mapearlo a riesgoMora
+    if (!normalized.riesgoMora && data.estadoDeuda) {
+      normalized.riesgoMora = data.estadoDeuda;
+    }
+
+    return normalized;
+  },
+
+  /**
+   * Normaliza parcialmente el payload de update (no toca campos que no vienen).
+   */
+  _normalizeUpdateData: (updateData) => {
+    const normalized = { ...updateData };
+
+    if (Object.prototype.hasOwnProperty.call(updateData, "telefono")) {
+      normalized.telefono = clienteService._ensureStringArray(
+        updateData.telefono,
+      );
+    }
+
+    if (
+      Object.prototype.hasOwnProperty.call(updateData, "referencias")
+    ) {
+      normalized.referencias = clienteService._ensureStringArray(
+        updateData.referencias,
+      );
+    }
+
+    if (Object.prototype.hasOwnProperty.call(updateData, "garantias")) {
+      normalized.garantias = clienteService._ensureStringArray(
+        updateData.garantias,
+      );
+    }
+
+    if (Object.prototype.hasOwnProperty.call(updateData, "fotosDocs")) {
+      normalized.fotosDocs = clienteService._ensureStringArray(
+        updateData.fotosDocs,
+      );
+    }
+
+    if (
+      Object.prototype.hasOwnProperty.call(
+        updateData,
+        "antiguedadVivenda",
+      )
+    ) {
+      normalized.antiguedadVivenda =
+        clienteService._toNumberOrNull(updateData.antiguedadVivenda);
+    }
+
+    if (Object.prototype.hasOwnProperty.call(updateData, "limiteCredito")) {
+      normalized.limiteCredito =
+        clienteService._toNumberOrNull(updateData.limiteCredito);
+    }
+
+    if (Object.prototype.hasOwnProperty.call(updateData, "tasaCliente")) {
+      normalized.tasaCliente =
+        clienteService._toNumberOrNull(updateData.tasaCliente);
+    }
+
+    if (
+      Object.prototype.hasOwnProperty.call(
+        updateData,
+        "fechaNacimiento",
+      ) &&
+      updateData.fechaNacimiento
+    ) {
+      if (!clienteService._isValidDate(updateData.fechaNacimiento)) {
+        throw new Error("fechaNacimiento must be a valid date");
+      }
+      normalized.fechaNacimiento = new Date(updateData.fechaNacimiento);
+    }
+
+    if (!normalized.riesgoMora && updateData.estadoDeuda) {
+      normalized.riesgoMora = updateData.estadoDeuda;
+    }
+
+    return normalized;
+  },
+
+  // ---------- Validaciones ----------
+
   _validateCreateData: (data) => {
     const required = [
-      'codigoCliente', 'identidadCliente', 'nacionalidad', 'RTN', 'estadoCivil',
-      'nivelEducativo', 'tipoVivienda', 'antiguedadVivenda', 'numerosDependientes',
-      'listadoDependientes', 'edadDependientes', 'zonaResidencialCliente', 'nombre',
-      'apellido', 'email', 'telefono', 'direccion', 'sexo', 'fechaNacimiento',
-      'frecuenciaPago', 'estadoDeuda'
+      "codigoCliente",
+      "identidadCliente",
+      "nacionalidad",
+      "RTN",
+      "estadoCivil",
+      "nivelEducativo",
+      "sexo",
+      "fechaNacimiento",
+      "email",
+      "telefono",
+      "direccion",
+      "tipoVivienda",
+      "antiguedadVivenda",
+      "zonaResidencialCliente",
+      "departamentoResidencia",
+      "municipioResidencia",
+      "limiteCredito",
+      "tasaCliente",
+      "frecuenciaPago",
+      "riesgoMora",
+      "nombre",
+      "apellido",
     ];
+
     const missing = [];
     for (const key of required) {
-      if (data[key] === undefined || data[key] === null) missing.push(key);
+      if (
+        data[key] === undefined ||
+        data[key] === null ||
+        data[key] === ""
+      ) {
+        missing.push(key);
+      }
     }
-    if (missing.length) throw new Error(`Missing required fields: ${missing.join(', ')}`);
+    if (missing.length) {
+      throw new Error(`Missing required fields: ${missing.join(", ")}`);
+    }
 
-    if (!clienteService._isValidEmail(data.email)) throw new Error('Invalid email format');
-    if (!clienteService._isValidDate(data.fechaNacimiento)) throw new Error('Invalid fechaNacimiento (expected date)');
-    if (!Array.isArray(data.telefono) || data.telefono.length === 0) throw new Error('telefono must be a non-empty array of strings');
-    if (!Array.isArray(data.numerosDependientes)) throw new Error('numerosDependientes must be an array of numbers');
-    if (!Array.isArray(data.listadoDependientes)) throw new Error('listadoDependientes must be an array of strings');
-    if (!Array.isArray(data.edadDependientes)) throw new Error('edadDependientes must be an array of numbers');
-    if (typeof data.antiguedadVivenda !== 'number') throw new Error('antiguedadVivenda must be a number');
-    if (data.limiteCredito !== undefined && typeof data.limiteCredito !== 'number') throw new Error('limiteCredito must be a number');
-    if (data.tasaCliente !== undefined && typeof data.tasaCliente !== 'number') throw new Error('tasaCliente must be a number');
+    if (!clienteService._isValidEmail(data.email)) {
+      throw new Error("Invalid email format");
+    }
+
+    if (!clienteService._isValidDate(data.fechaNacimiento)) {
+      throw new Error("fechaNacimiento must be a valid date");
+    }
+
+    if (!Array.isArray(data.telefono) || data.telefono.length === 0) {
+      throw new Error("telefono must be a non-empty array of strings");
+    }
   },
 
   _validateUpdateData: (updateData) => {
-    if (!updateData || typeof updateData !== 'object') throw new Error('Invalid update payload');
-    if (Object.prototype.hasOwnProperty.call(updateData, 'codigoCliente')) {
-      throw new Error('codigoCliente cannot be updated');
+    if (!updateData || typeof updateData !== "object") {
+      throw new Error("Invalid update payload");
     }
-    if (updateData.email !== undefined && !clienteService._isValidEmail(updateData.email)) throw new Error('Invalid email format');
-    if (updateData.fechaNacimiento !== undefined && !clienteService._isValidDate(updateData.fechaNacimiento)) throw new Error('Invalid fechaNacimiento (expected date)');
-    if (updateData.telefono !== undefined && (!Array.isArray(updateData.telefono) || updateData.telefono.length === 0)) throw new Error('telefono must be a non-empty array of strings');
-    if (updateData.numerosDependientes !== undefined && !Array.isArray(updateData.numerosDependientes)) throw new Error('numerosDependientes must be an array of numbers');
-    if (updateData.listadoDependientes !== undefined && !Array.isArray(updateData.listadoDependientes)) throw new Error('listadoDependientes must be an array of strings');
-    if (updateData.edadDependientes !== undefined && !Array.isArray(updateData.edadDependientes)) throw new Error('edadDependientes must be an array of numbers');
-    if (updateData.antiguedadVivenda !== undefined && typeof updateData.antiguedadVivenda !== 'number') throw new Error('antiguedadVivenda must be a number');
-    if (updateData.limiteCredito !== undefined && typeof updateData.limiteCredito !== 'number') throw new Error('limiteCredito must be a number');
-    if (updateData.tasaCliente !== undefined && typeof updateData.tasaCliente !== 'number') throw new Error('tasaCliente must be a number');
+
+    // No permitir cambiar codigoCliente
+    if (
+      Object.prototype.hasOwnProperty.call(
+        updateData,
+        "codigoCliente",
+      )
+    ) {
+      throw new Error("codigoCliente cannot be updated");
+    }
+
+    if (
+      Object.prototype.hasOwnProperty.call(updateData, "email") &&
+      !clienteService._isValidEmail(updateData.email)
+    ) {
+      throw new Error("Invalid email format");
+    }
+
+    if (
+      Object.prototype.hasOwnProperty.call(
+        updateData,
+        "fechaNacimiento",
+      ) &&
+      updateData.fechaNacimiento &&
+      !clienteService._isValidDate(updateData.fechaNacimiento)
+    ) {
+      throw new Error("fechaNacimiento must be a valid date");
+    }
+
+    if (
+      Object.prototype.hasOwnProperty.call(updateData, "telefono") &&
+      !Array.isArray(updateData.telefono)
+    ) {
+      throw new Error("telefono must be an array of strings");
+    }
+
+    if (
+      Object.prototype.hasOwnProperty.call(updateData, "riesgoMora") &&
+      updateData.riesgoMora
+    ) {
+      const riesgoValidos = ["Al día", "Mora leve", "Mora moderada", "Mora grave"];
+      if (!riesgoValidos.includes(updateData.riesgoMora)) {
+        throw new Error("riesgoMora has an invalid value");
+      }
+    }
   },
 
-  createCliente: async (clienteData) => {
-    // Validate payload
-    clienteService._validateCreateData(clienteData);
+  // ---------- Crear cliente ----------
 
-    const existingCliente = await clienteRepository.findByCodigoCliente(clienteData.codigoCliente);
-    if (existingCliente) {
-      throw new Error("A cliente with this codigoCliente already exists.");
+  createCliente: async (rawData) => {
+    // 1) Normalizar payload del front
+    const data = clienteService._normalizeCreateData(rawData);
+
+    // 2) Validar campos requeridos/formato
+    clienteService._validateCreateData(data);
+
+    // 3) Verificar unicidad básica (según tu modelo)
+    const existingByCodigo =
+      await clienteRepository.findByCodigoCliente(data.codigoCliente);
+    if (existingByCodigo) {
+      throw new Error("A client with this codigoCliente already exists.");
     }
-    const newCliente = await clienteRepository.createCliente(clienteData);
-    return newCliente;
+
+    const existingByIdentidad =
+      await clienteRepository.findByIdentidadCliente(
+        data.identidadCliente,
+      );
+    if (existingByIdentidad) {
+      throw new Error(
+        "A client with this identidadCliente already exists.",
+      );
+    }
+
+    const existingByRtn = await clienteRepository.findByRTN(data.RTN);
+    if (existingByRtn) {
+      throw new Error("A client with this RTN already exists.");
+    }
+
+    const existingByEmail = await clienteRepository.findByEmail(data.email);
+    if (existingByEmail) {
+      throw new Error("A client with this email already exists.");
+    }
+
+    // 4) Crear en base de datos
+    const created = await clienteRepository.createCliente(data);
+    return created;
   },
 
-  updateClienteByCodigo: async (codigoCliente, updateData) => {
-    // If the client accidentally includes codigoCliente in the payload, ignore it (don't fail)
-    if (updateData && Object.prototype.hasOwnProperty.call(updateData, 'codigoCliente')) {
-      delete updateData.codigoCliente;
+  // ---------- Actualizar cliente por código ----------
+
+  updateClienteByCodigo: async (codigoCliente, rawUpdateData) => {
+    if (!codigoCliente) {
+      throw new Error("codigoCliente is required for update");
     }
 
-    // Validate update payload (types and formats)
-    clienteService._validateUpdateData(updateData);
-    const existingCliente = await clienteRepository.findByCodigoCliente(codigoCliente);
-    if (!existingCliente) {
-      throw new Error("Cliente with the provided codigoCliente does not exist.");
+    const normalized = clienteService._normalizeUpdateData(rawUpdateData);
+    clienteService._validateUpdateData(normalized);
+
+    const existing = await clienteRepository.findByCodigoCliente(
+      codigoCliente,
+    );
+    if (!existing) {
+      throw new Error(
+        "Cliente with the provided codigoCliente does not exist.",
+      );
     }
-    const updatedCliente = await clienteRepository.updateClienteByCodigo(codigoCliente, updateData);
-    return updatedCliente;
+
+    const updated = await clienteRepository.updateClienteByCodigo(
+      codigoCliente,
+      normalized,
+    );
+    return updated;
   },
+
+  // ---------- Resumen para la tabla del front ----------
+
+  /**
+   * Devuelve un arreglo de "resúmenes" de clientes para la tabla del frontend.
+   * Campos:
+   *  - id
+   *  - codigoCliente
+   *  - nombreCompleto
+   *  - identidadCliente
+   *  - telefonoPrincipal
+   *  - departamentoResidencia
+   *  - municipioResidencia
+   *  - zonaResidencialCliente
+   *  - actividad (boolean)
+   */
   getAllClientes: async () => {
-    const clientes = await clienteRepository.findAllClientes();
-    return clientes;
-  },
-
-  getClienteByCodigo: async (codigoCliente) => {
-    const cliente = await clienteRepository.findByCodigoCliente(codigoCliente);
-    if (!cliente) {
-      throw new Error("Cliente with the provided codigoCliente does not exist.");
-    }
-    return cliente;
-  },
-
-  // ==== NUEVO: resumen de clientes para el frontend ====
-  getClientesResumen: async () => {
-    // 1) Traemos todos los clientes activos (o todos, según tu lógica)
     const clientes = await clienteRepository.findAllClientes();
 
     if (!clientes || clientes.length === 0) {
       return [];
     }
 
-    // Lista de IDs de clientes
-    const clienteIds = clientes.map((c) => c._id);
-
-    // 2) Traemos todos los financiamientos de esos clientes
-    const financiamientos = await financiamientoRepository.findByClienteIds(clienteIds);
-
-    // 3) Traemos todos los abonos de esos clientes (ordenados desc por fecha)
-    const abonos = await abonoRepository.findByClienteIds(clienteIds);
-
-    // Mapas para acumular info por cliente
-    const mapaPrestamos = new Map();   // {clienteId: {activos, tieneMora}}
-    const mapaUltimoAbono = new Map(); // {clienteId: fechaAbono}
-
-    // Procesamos financiamientos
-    for (const f of financiamientos) {
-      const idCliente = String(f.clienteId);
-      if (!mapaPrestamos.has(idCliente)) {
-        mapaPrestamos.set(idCliente, { activos: 0, tieneMora: false });
-      }
-      const info = mapaPrestamos.get(idCliente);
-      info.activos += 1;
-
-      if (f.estadoFinanciamiento === 'EN_MORA') {
-        info.tieneMora = true;
-      }
-    }
-
-    // Procesamos abonos (como vienen ordenados desc, el primero que veamos es el último)
-    for (const a of abonos) {
-      const idCliente = String(a.clienteId);
-      if (!mapaUltimoAbono.has(idCliente)) {
-        mapaUltimoAbono.set(idCliente, a.fechaAbono);
-      }
-    }
-
-    // Armamos el resumen final por cliente
     const resumen = clientes.map((c) => {
-      const idCliente = String(c._id);
+      const nombreCompleto =
+        c.nombreCompleto ||
+        [c.nombre, c.apellido].filter(Boolean).join(" ") ||
+        "Cliente";
 
-      const infoPrestamos = mapaPrestamos.get(idCliente) || {
-        activos: 0,
-        tieneMora: false,
-      };
-
-      const ultimoMovimiento = mapaUltimoAbono.get(idCliente) || null;
+      let telefonoPrincipal = null;
+      if (Array.isArray(c.telefono) && c.telefono.length > 0) {
+        telefonoPrincipal = c.telefono[0];
+      }
 
       return {
-        cliente: c, // objeto cliente completo tal como viene de la BD
-        prestamosActivos: infoPrestamos.activos,
-        tieneMora: infoPrestamos.tieneMora,
-        ultimoMovimiento,
+        id: c._id.toString(),
+        codigoCliente: c.codigoCliente,
+        nombreCompleto,
+        identidadCliente: c.identidadCliente || null,
+        telefonoPrincipal,
+        departamentoResidencia: c.departamentoResidencia || null,
+        municipioResidencia: c.municipioResidencia || null,
+        zonaResidencialCliente: c.zonaResidencialCliente || null,
+        actividad: c.activo === true,
       };
     });
 
     return resumen;
   },
 
+  // ---------- Obtener/detalle básico ----------
+
+  getClienteByCodigo: async (codigoCliente) => {
+    const item = await clienteRepository.findByCodigoCliente(codigoCliente);
+    if (!item) {
+      throw new Error(
+        "Cliente with the provided codigoCliente does not exist.",
+      );
+    }
+    return item;
+  },
+
+  getClienteById: async (id) => {
+    const item = await clienteRepository.findById(id);
+    if (!item) {
+      throw new Error("Cliente with the provided id does not exist.");
+    }
+    return item;
+  },
+
+  // ---------- Eliminar ----------
 
   deleteClienteByCodigo: async (codigoCliente) => {
-    if (!codigoCliente) throw new Error("codigoCliente is required for deleting cliente.");
-    const existingCliente = await clienteRepository.findByCodigoCliente(codigoCliente);
-    if (!existingCliente) {
-      throw new Error("Cliente with the provided codigoCliente does not exist.");
+    if (!codigoCliente) {
+      throw new Error("codigoCliente is required for deleting cliente.");
     }
-    await clienteRepository.deleteClienteByCodigo(codigoCliente);
-    return { message: 'Cliente disabled successfully' };
-  }
+
+    const existing = await clienteRepository.findByCodigoCliente(
+      codigoCliente,
+    );
+    if (!existing) {
+      throw new Error(
+        "Cliente with the provided codigoCliente does not exist.",
+      );
+    }
+
+    return await clienteRepository.deleteClienteByCodigo(codigoCliente);
+  },
 };

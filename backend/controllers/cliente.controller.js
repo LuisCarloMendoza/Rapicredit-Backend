@@ -22,10 +22,11 @@ export const clienteController = {
   },
   getAllClientes: async (req, res) => {
     try {
-      const clientes = await clienteService.getAllClientes();
-      res.status(200).json(clientes);
-    } catch (error) {
-      res.status(403).json({ message: error.message });
+      const data = await clienteService.getAllClientes();
+      res.status(200).json(data);
+    } catch (err) {
+      console.error("getAllClientes error:", err);
+      res.status(500).json({ message: "Error al obtener clientes" });
     }
   },
 
