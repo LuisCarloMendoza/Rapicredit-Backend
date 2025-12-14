@@ -9,6 +9,7 @@ export async function verifyFirebaseToken(req, res, next) {
       id: 'dev-user',
       nombre: 'Usuario Dev',
       permisos: ['Gestionar clientes', 'Ver/Buscar cliente', 'Gestionar préstamos', 'Ver/Buscar solicitud'],
+      rol: 'gerente',
     };
     return next();
   }

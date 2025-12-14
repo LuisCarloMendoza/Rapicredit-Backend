@@ -158,7 +158,6 @@ export const clienteService = {
       "codigoCliente",
       "identidadCliente",
       "nacionalidad",
-      "RTN",
       "estadoCivil",
       "nivelEducativo",
       "sexo",
@@ -283,10 +282,10 @@ export const clienteService = {
       );
     }
 
-    const existingByRtn = await clienteRepository.findByRTN(data.RTN);
+    /*const existingByRtn = await clienteRepository.findByRTN(data.RTN);
     if (existingByRtn) {
       throw new Error("A client with this RTN already exists.");
-    }
+    } */
 
     const existingByEmail = await clienteRepository.findByEmail(data.email);
     if (existingByEmail) {
