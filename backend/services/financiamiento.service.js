@@ -5,6 +5,22 @@ import { abonoRepository } from "../repositories/abono.repository.js";
 // si tu repo de cobradores se llama distinto, ajústalo:
 import { userRepository } from "../repositories/user.repository.js";
 
+const FRECUENCIA_MAP = {
+  "Días": "DIARIA",
+  "Dias": "DIARIA",
+  "Semanas": "SEMANAL",
+  "Quincenas": "QUINCENAL",
+  "Meses": "MENSUAL",
+};
+
+function normalizeFrecuenciaPago(value) {
+  if (!value) return null;
+  if (FRECUENCIA_MAP[value]) return FRECUENCIA_MAP[value];
+  const canon = String(value).toUpperCase();
+  if (["DIARIA", "SEMANAL", "QUINCENAL", "MENSUAL"].includes(canon)) return canon;
+  throw new Error(`frecuenciaPago inválida: ${value}`);
+}
+
 export const financiamientoService = {
   // ----------------- Helpers internos -----------------
   _isValidDate: (d) => {

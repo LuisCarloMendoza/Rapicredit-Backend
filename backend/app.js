@@ -30,7 +30,9 @@ import { requirePermiso } from "./middleware/requirePermiso.js";
 dotenv.config();
 
 const app = express();
+
 app.use(express.json());
+
 const port = process.env.PORT || 3001;
 
 const allowedOrigin = process.env.CORS_ORIGIN || "http://localhost:3000";

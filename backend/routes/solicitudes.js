@@ -1,6 +1,10 @@
 import express from 'express';
 import { solicitudController } from '../controllers/solicitud.controller.js';
-import { generarPdfSolicitud } from '../services/solicitudPDF.service.js'; 
+import { generarPdfSolicitud } from '../services/solicitudPDF.service.js';
+
+import { verifyFirebaseToken } from "../middleware/verifyFirebaseToken.js"; // asegúrate de que este middleware existe
+import { requirePermiso } from "../middleware/requirePermiso.js"; // Asegúrate que este middleware también existe
+
 
 const router = express.Router();
 
@@ -24,5 +28,13 @@ router.get('/', solicitudController.filterSolicitudes); // Con query params para
 router.get('/:codigoSolicitud', solicitudController.getSolicitudByCodigo);
 
 router.patch('/:codigoSolicitud/status', solicitudController.changeSolicitudStatus);
+
+// Esta ruta permite al admin aprobar la solicitud (requiere permiso)
+router.post(
+    "/:id/aprobar",  // La ruta que llamará a aprobar la solicitud
+    verifyFirebaseToken,  // Verificación del token del usuario
+    requirePermiso("Gestionar solicitudes"),  // Se asegura que el usuario tenga el permiso adecuado
+    solicitudController.aprobar  // Método que maneja la aprobación
+);
 
 export default router;

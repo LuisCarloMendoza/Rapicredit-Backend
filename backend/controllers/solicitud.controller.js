@@ -1,5 +1,5 @@
 import { solicitudService } from '../services/solicitud.service.js';
-import Solicitud from '../models/solicitud.model.js'; 
+import Solicitud from '../models/solicitud.model.js';
 import { generarPdfSolicitud } from '../services/solicitudPDF.service.js';
 
 const getSolicitudRawByCodigo = async (codigoSolicitud) => {
@@ -126,8 +126,8 @@ export const solicitudController = {
       const { solicitudReportService } = await import('../services/solicitudReport.service.js');
       const buffer = await solicitudReportService.generateApprovedSolicitudesWorkbook({ frequency, from, to });
 
-      const fromLabel = from ? String(from).replace(/:/g,'') : 'any';
-      const toLabel = to ? String(to).replace(/:/g,'') : 'any';
+      const fromLabel = from ? String(from).replace(/:/g, '') : 'any';
+      const toLabel = to ? String(to).replace(/:/g, '') : 'any';
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       res.setHeader('Content-Disposition', `attachment; filename="solicitudes_aprobadas_${frequency}_${fromLabel}_${toLabel}.xlsx"`);
       res.status(200).send(Buffer.from(buffer));
@@ -155,6 +155,31 @@ export const solicitudController = {
     } catch (error) {
       console.error('Error exporting PDF:', error);
       res.status(500).json({ message: 'Error generating PDF' });
+    }
+  },
+  // Método para aprobar una solicitud
+  async aprobar(req, res) {
+    try {
+      // Tomamos el ID de la solicitud desde los parámetros
+      const { id } = req.params;
+
+      // Tomamos el ID del usuario que está aprobando la solicitud
+      const usuarioDecisionId = req.currentUser?.id || null;
+
+      // Llamamos al servicio que procesa la aprobación
+      const result = await solicitudService.aprobarSolicitud({
+        solicitudId: id,
+        usuarioDecisionId,
+      });
+
+      // Respondemos con el resultado
+      return res.status(200).json({
+        message: "Solicitud aprobada y préstamo creado",
+        ...result,
+      });
+    } catch (err) {
+      console.error("Error al aprobar la solicitud:", err);
+      return res.status(400).json({ message: err.message || "Error al aprobar solicitud" });
     }
   },
 };

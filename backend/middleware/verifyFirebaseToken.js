@@ -25,12 +25,14 @@ export async function verifyFirebaseToken(req, res, next) {
     const decodedToken = await admin.auth().verifyIdToken(token);
 
     const user = await userService.getUserByFirebaseUid(decodedToken.uid);
+
     if (!user) {
       return res.status(401).json({ message: 'Unauthorized: User not found' });
     }
 
     req.currentUser = user;
     next();
+
   } catch (error) {
     console.error('Error verifying Firebase token', error);
     res.status(401).json({ message: 'Unauthorized' });
