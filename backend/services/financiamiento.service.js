@@ -3,7 +3,7 @@ import { financiamientoRepository } from "../repositories/financiamiento.reposit
 import { clienteRepository } from "../repositories/cliente.repository.js";
 import { abonoRepository } from "../repositories/abono.repository.js";
 // si tu repo de cobradores se llama distinto, ajústalo:
-import { userRepository } from "../repositories/user.repository.js";
+// import { empleadoRepository } from "../repositories/user.repository.js"; // use if needed
 
 const FRECUENCIA_MAP = {
   "Días": "DIARIA",

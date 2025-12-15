@@ -6,8 +6,7 @@ import { MongoClient, ServerApiVersion } from 'mongodb';
 import mongoose from 'mongoose';
 import fs from 'fs';
 import admin from 'firebase-admin';
-import router from "./routes/users.js";
-import userRouter from "./routes/users.js";
+import empleadosRouter from "./routes/empleados.js";
 import clienteRouter from "./routes/clients.js";
 import permisoRouter from "./routes/permisos.js";
 import financiamientosRouter from "./routes/financiamientos.js";
@@ -81,7 +80,7 @@ app.get('/', (req, res) => {
 });
 /*
 //Endpoints de Usuarios
-app.use('/api/users', userRouter);
+app.use('/api/empleados', empleadosRouter);
 //Endpoints de Clientes
 app.use('/api/clientes', clienteRouter);
 
@@ -120,7 +119,7 @@ app.use('/api/reportes', reportesRouter);
 
 
 // A partir de aquí, todo requiere Firebase token
-app.use('/api/users', verifyFirebaseToken, userRouter);
+app.use('/api/empleados', verifyFirebaseToken, empleadosRouter);
 app.use('/api/clientes', verifyFirebaseToken, clienteRouter);
 app.use('/api/permisos', verifyFirebaseToken, permisoRouter);
 app.use('/api/financiamientos', verifyFirebaseToken, financiamientosRouter);

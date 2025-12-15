@@ -1,12 +1,12 @@
-import { userService } from "../services/user.service.js";
+import { empleadoService as userService } from "../services/empleado.service.js";
 import admin from "firebase-admin";
-import User from '../models/user.model.js';
+import Empleado from '../models/empleado.model.js';
 
 export const userController = {
   register: async (req, res) => {
     try {
       // forward full registration payload to service (service will validate required fields)
-      const newUser = await userService.createUser(req.body);
+      const newUser = await userService.createEmpleado(req.body);
       res.status(201).json(newUser);
     } catch (error) {
       res.status(400).json({ message: error.message });
@@ -26,7 +26,7 @@ export const userController = {
         if (!decoded || !decoded.uid) {
           return res.status(401).json({ message: "Invalid token" });
         }
-        const user = await userService.getUserByUid(decoded.uid);
+        const user = await userService.getEmpleadoByUid(decoded.uid);
         if (!user) return res.status(404).json({ message: "User not found" });
         return res.status(200).json(user);
       }
@@ -48,7 +48,7 @@ export const userController = {
     try {
       const uid = req.params.uid;
       const updateData = req.body;
-      const updatedUser = await userService.updateUserByUid(uid, updateData);
+      const updatedUser = await userService.updateEmpleadoByUid(uid, updateData);
       res.status(200).json(updatedUser);
     } catch (error) {
       res.status(400).json({ message: error.message });
@@ -59,7 +59,7 @@ export const userController = {
     try {
       const codigoUsuario = req.params.codigoUsuario;
       const updateData = req.body;
-      const updatedUser = await userService.updateUserByCodigoUsuario(codigoUsuario, updateData);
+      const updatedUser = await userService.updateEmpleadoByCodigoUsuario(codigoUsuario, updateData);
       res.status(200).json(updatedUser);
     } catch (error) {
       res.status(400).json({ message: error.message });

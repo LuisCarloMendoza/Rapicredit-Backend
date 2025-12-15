@@ -7,7 +7,7 @@ const abonoSchema = new Schema(
     codigoAbono: { type: String, required: true, unique: true, immutable: true },
     financiamientoId: { type: Schema.Types.ObjectId, ref: 'Financiamiento', required: true },
     clienteId: { type: Schema.Types.ObjectId, ref: 'Cliente', required: true },
-    cobradorId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    cobradorId: { type: Schema.Types.ObjectId, ref: 'Empleado', required: true },
     fechaAbono: { type: Date, required: true },
     montoAbono: { type: Number, required: true },
     aplicadoAMora: { type: Number, default: 0 },

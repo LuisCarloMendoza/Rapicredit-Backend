@@ -17,7 +17,7 @@ const prestamoSchema = new Schema(
 
         // Relaciones
         clienteId: { type: Schema.Types.ObjectId, ref: "Cliente", required: true },
-        cobradorAsignadoId: { type: Schema.Types.ObjectId, ref: "User", required: false },
+        cobradorAsignadoId: { type: Schema.Types.ObjectId, ref: "Empleado", required: false },
 
         // Montos
         capitalInicial: { type: Number, required: true },

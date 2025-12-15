@@ -4,91 +4,84 @@ import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 10;
 
-
-export const userService = {
-  getUserByUid: async (uid) => {
+export const empleadoService = {
+  getEmpleadoByUid: async (uid) => {
     return await empleadoRepository.findByUid(uid);
   },
 
-  loginByFirebaseUser: async (firebaseUser) => {
+  loginByFirebaseEmpleado: async (firebaseUser) => {
     const { uid } = firebaseUser;
     if (!uid) {
       throw new Error("UID is required for login");
     }
-    let user = await empleadoRepository.findByUid(uid);
-    if (!user) {
-      throw new Error("User not found");
+    let empleado = await empleadoRepository.findByUid(uid);
+    if (!empleado) {
+      throw new Error("Empleado not found");
     }
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    const passwordMatch = await bcrypt.compare(password, empleado.password);
     if (!passwordMatch) {
       throw new Error('Invalid credentials');
     }
-    return user;
+    return empleado;
   },
 
-  // Credential-based login: identifier may be { usuario } or { email }
   loginWithCredentials: async ({ usuario, email, password }) => {
     if (!password) throw new Error('Password is required');
 
-    let user = null;
+    let empleado = null;
     if (usuario) {
-      user = await empleadoRepository.findByUsuario(usuario);
+      empleado = await empleadoRepository.findByUsuario(usuario);
     } else if (email) {
-      user = await empleadoRepository.findByEmail(email);
+      empleado = await empleadoRepository.findByEmail(email);
     }
 
-    if (!user) {
+    if (!empleado) {
       throw new Error('Invalid credentials');
     }
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    const passwordMatch = await bcrypt.compare(password, empleado.password);
     if (!passwordMatch) {
       throw new Error('Invalid credentials');
     }
 
-    return user;
+    return empleado;
   },
 
-  createUser: async (userData) => {
-    // Expected fields: codigoUsuario, email, password, usuario, nombreCompleto, telefono
-    if (!userData || typeof userData !== 'object') throw new Error('Invalid registration payload');
+  createEmpleado: async (empleadoData) => {
+    if (!empleadoData || typeof empleadoData !== 'object') throw new Error('Invalid registration payload');
 
-    const { codigoUsuario, email, password, usuario, nombreCompleto, telefono, rol, permisos, actividad } = userData;
+    const { codigoUsuario, email, password, usuario, nombreCompleto, telefono, rol, permisos, actividad } = empleadoData;
 
     const required = ['codigoUsuario', 'email', 'password', 'usuario', 'nombreCompleto', 'telefono', 'rol'];
     const missing = [];
     for (const key of required) {
-      if (userData[key] === undefined || userData[key] === null || userData[key] === '') missing.push(key);
+      if (empleadoData[key] === undefined || empleadoData[key] === null || empleadoData[key] === '') missing.push(key);
     }
     if (missing.length) throw new Error(`Missing required fields: ${missing.join(', ')}`);
 
-    // Basic email validation
     if (typeof email !== 'string' || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
       throw new Error('Invalid email format');
     }
 
-    // telefono should be a string
     if (typeof telefono !== 'string' || telefono.trim() === '') {
       throw new Error('telefono must be a non-empty string');
     }
 
-    // rol validation: only allowed values
     if (typeof rol !== 'string' || !['gerente', 'supervisor', 'asesor'].includes(rol.toLowerCase())) {
       throw new Error("Invalid rol value. Allowed values: gerente, supervisor, asesor");
     }
 
     const existingByCodigo = await empleadoRepository.findByCodigoUsuario(codigoUsuario);
     if (existingByCodigo) {
-      throw new Error('A user with this codigoUsuario already exists.');
+      throw new Error('An empleado with this codigoUsuario already exists.');
     }
     const existingByEmail = await empleadoRepository.findByEmail(email);
     if (existingByEmail) {
-      throw new Error('A user with this email already exists.');
+      throw new Error('An empleado with this email already exists.');
     }
 
     let firebaseUser;
     try {
-      // create firebase user with email + password; include displayName and phoneNumber when available
       const createPayload = { email, password };
       if (usuario) createPayload.displayName = usuario;
       if (telefono) createPayload.phoneNumber = telefono;
@@ -99,11 +92,10 @@ export const userService = {
 
     const uid = firebaseUser.uid;
 
-    // Ensure no duplicate by uid exists in Mongo
     const existingByUid = await empleadoRepository.findByUid(uid);
-    if (existingByUid) throw new Error('A user with this UID already exists in the database.');
+    if (existingByUid) throw new Error('An empleado with this UID already exists in the database.');
 
-    const newUserData = {
+    const newEmpleadoData = {
       uid,
       codigoUsuario,
       usuario: usuario || codigoUsuario,
@@ -113,49 +105,47 @@ export const userService = {
       email,
       telefono,
       permisos: Array.isArray(permisos) ? permisos : [],
-      // store password in the field required by schema
       password: await bcrypt.hash(password, SALT_ROUNDS),
     };
     
-    const newUser = await empleadoRepository.createEmpleado(newUserData);
-    return newUser;
+    const newEmpleado = await empleadoRepository.createEmpleado(newEmpleadoData);
+    return newEmpleado;
   },
 
-  updateUserByUid: async (uid, updateData) => {
+  updateEmpleadoByUid: async (uid, updateData) => {
     if(!uid){
-      throw new Error("UID is required for updating user");
+      throw new Error("UID is required for updating empleado");
     }
     const existe = await empleadoRepository.findByUid(uid);
     if(!existe){
-      throw new Error("User with the provided UID does not exist");
+      throw new Error("Empleado with the provided UID does not exist");
     }
-    const updatedUser = await empleadoRepository.updateEmpleadoByUid(uid, updateData);
-    return updatedUser;
+    const updatedEmpleado = await empleadoRepository.updateEmpleadoByUid(uid, updateData);
+    return updatedEmpleado;
   },
 
-
-  updateUserByCodigoUsuario: async (codigoUsuario, updateData) => {
+  updateEmpleadoByCodigoUsuario: async (codigoUsuario, updateData) => {
     if (!codigoUsuario) {
-      throw new Error("codigoUsuario is required for updating user");
+      throw new Error("codigoUsuario is required for updating empleado");
     }
     const existe = await empleadoRepository.findByCodigoUsuario(codigoUsuario);
     if (!existe) {
-      throw new Error("User with the provided codigoUsuario does not exist");
+      throw new Error("Empleado with the provided codigoUsuario does not exist");
     }
-    const updatedUser = await empleadoRepository.updateEmpleadoByCodigoUsuario(
+    const updatedEmpleado = await empleadoRepository.updateEmpleadoByCodigoUsuario(
       codigoUsuario,
       updateData
     );
-    return updatedUser;
+    return updatedEmpleado;
   },
 
   deleteByCodigoUsuario: async (codigoUsuario) => {
     if (!codigoUsuario) {
-      throw new Error("codigoUsuario is required for deleting user");
+      throw new Error("codigoUsuario is required for deleting empleado");
     }
     const existe = await empleadoRepository.findByCodigoUsuario(codigoUsuario);
     if (!existe) {
-      throw new Error("User with the provided codigoUsuario does not exist");
+      throw new Error("Empleado with the provided codigoUsuario does not exist");
     }
     return await empleadoRepository.deleteByCodigoUsuario(codigoUsuario);
   },

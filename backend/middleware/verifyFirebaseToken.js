@@ -1,5 +1,5 @@
 import { admin } from '../firebase.js';         // asumiendo que así importas firebase admin
-import { userService } from '../services/user.service.js'; // si tienes esto
+import { EmpleadoService } from '../services/empleado.service.js'; // mantiene nombre, internamente usa empleadoRepository
 
 export async function verifyFirebaseToken(req, res, next) {
   // 🔧 MODO DESARROLLO: si está activado, no validamos nada

@@ -5,7 +5,7 @@ const solicitudSchema = new mongoose.Schema(
     codigoSolicitud: { type: String, unique: true, required: true, immutable: true },
 
     clienteId: { type: mongoose.Schema.Types.ObjectId, ref: "Cliente", required: true },
-    vendedorId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    vendedorId: { type: mongoose.Schema.Types.ObjectId, ref: "Empleado", required: true },
 
     // --- Lo solicitado (base) ---
     capitalSolicitado: { type: Number, required: true },
@@ -49,8 +49,8 @@ const solicitudSchema = new mongoose.Schema(
 
     observaciones: { type: String, default: "" },
 
-    usuarioCreacionId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: false },
-    usuarioDecisionId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+    usuarioCreacionId: { type: mongoose.Schema.Types.ObjectId, ref: "Empleado", required: false },
+    usuarioDecisionId: { type: mongoose.Schema.Types.ObjectId, ref: "Empleado", default: null },
 
     // ✅ link cuando se aprueba
     prestamoId: { type: mongoose.Schema.Types.ObjectId, ref: "Prestamo", default: null },

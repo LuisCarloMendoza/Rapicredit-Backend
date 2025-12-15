@@ -4,7 +4,7 @@ import express from 'express';
 import request from 'supertest';
 import solicitudRouter from '../routes/solicitudes.js';
 import Cliente from '../models/cliente.model.js';
-import User from '../models/user.model.js';
+import Empleado from '../models/empleado.model.js';
 import Solicitud from '../models/solicitud.model.js';
 import fs from 'fs';
 
@@ -65,7 +65,7 @@ beforeEach(async () => {
   await cliente.save();
 
   // Seed user
-  const user = new User({
+  const user = new Empleado({
     uid: 'seed-uid',
     codigoUsuario: 'USR-REPORT',
     usuario: 'report_user',
@@ -73,7 +73,7 @@ beforeEach(async () => {
     email: 'report.user@test.com',
     rol: 'Vendedor',
     telefono: '+50477777777',
-    contraseña: 'TestPass123!'
+    password: 'TestPass123!'
   });
   await user.save();
 
