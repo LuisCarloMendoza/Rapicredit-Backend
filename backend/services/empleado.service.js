@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 10;
 
+
 export const empleadoService = {
   getEmpleadoByUid: async (uid) => {
     return await empleadoRepository.findByUid(uid);
@@ -25,6 +26,7 @@ export const empleadoService = {
     return empleado;
   },
 
+  // Credential-based login: identifier may be { usuario } or { email }
   loginWithCredentials: async ({ usuario, email, password }) => {
     if (!password) throw new Error('Password is required');
 
@@ -48,6 +50,7 @@ export const empleadoService = {
   },
 
   createEmpleado: async (empleadoData) => {
+    // Expected fields: codigoUsuario, email, password, usuario, nombreCompleto, telefono
     if (!empleadoData || typeof empleadoData !== 'object') throw new Error('Invalid registration payload');
 
     const { codigoUsuario, email, password, usuario, nombreCompleto, telefono, rol, permisos, estado } = empleadoData;
@@ -59,14 +62,17 @@ export const empleadoService = {
     }
     if (missing.length) throw new Error(`Missing required fields: ${missing.join(', ')}`);
 
+    // Basic email validation
     if (typeof email !== 'string' || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
       throw new Error('Invalid email format');
     }
 
+    // telefono should be a string
     if (typeof telefono !== 'string' || telefono.trim() === '') {
       throw new Error('telefono must be a non-empty string');
     }
 
+    // rol validation: only allowed values
     if (typeof rol !== 'string' || !['gerente', 'supervisor', 'asesor'].includes(rol.toLowerCase())) {
       throw new Error("Invalid rol value. Allowed values: gerente, supervisor, asesor");
     }
@@ -82,6 +88,7 @@ export const empleadoService = {
 
     let firebaseUser;
     try {
+      // create firebase empleado with email + password; include displayName and phoneNumber when available
       const createPayload = { email, password };
       if (usuario) createPayload.displayName = usuario;
       if (telefono) createPayload.phoneNumber = telefono;
@@ -92,6 +99,7 @@ export const empleadoService = {
 
     const uid = firebaseUser.uid;
 
+    // Ensure no duplicate by uid exists in Mongo
     const existingByUid = await empleadoRepository.findByUid(uid);
     if (existingByUid) throw new Error('An empleado with this UID already exists in the database.');
 
@@ -105,6 +113,7 @@ export const empleadoService = {
       email,
       telefono,
       permisos: Array.isArray(permisos) ? permisos : [],
+      // store password in the field required by schema
       password: await bcrypt.hash(password, SALT_ROUNDS),
     };
     
@@ -123,6 +132,7 @@ export const empleadoService = {
     const updatedEmpleado = await empleadoRepository.updateEmpleadoByUid(uid, updateData);
     return updatedEmpleado;
   },
+
 
   updateEmpleadoByCodigoUsuario: async (codigoUsuario, updateData) => {
     if (!codigoUsuario) {

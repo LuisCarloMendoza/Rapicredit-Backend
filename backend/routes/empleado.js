@@ -9,16 +9,16 @@ userRouter.post("/register", userController.register);
 
 // Do not require the Firebase token middleware for login so users can
 // authenticate with credentials (`usuario`/`email` + `password`).
-//userRouter.post("/login", userController.login);
+userRouter.post("/login", userController.login);
 
-//userRouter.put("/:uid",  userController.updateByUid);
+userRouter.put("/:uid",  userController.updateByUid);
 
-//userRouter.get("/",  userController.getAll);
+userRouter.get("/",  userController.getAll);
 
-// Delete user by codigoUsuario
-//userRouter.delete("/codigo/:codigoUsuario", userController.deleteByCodigoUsuario);
+//Delete user by codigoUsuario
+userRouter.delete("/codigo/:codigoUsuario", userController.deleteByCodigoUsuario);
 
-
+/*
 // Registro de usuario: solo gerente autenticado
 userRouter.post(
     "/register",
@@ -53,5 +53,5 @@ userRouter.delete(
     requireRole(['gerente']),
     userController.deleteByCodigoUsuario
 );
-
+*/
 export default userRouter;

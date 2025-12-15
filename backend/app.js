@@ -6,7 +6,7 @@ import { MongoClient, ServerApiVersion } from 'mongodb';
 import mongoose from 'mongoose';
 import fs from 'fs';
 import admin from 'firebase-admin';
-import empleadosRouter from "./routes/empleados.js";
+import empleadosRouter from "./routes/empleado.js";
 import clienteRouter from "./routes/clients.js";
 import permisoRouter from "./routes/permisos.js";
 import financiamientosRouter from "./routes/financiamientos.js";
