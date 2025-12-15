@@ -94,6 +94,17 @@ export const userController = {
     }
   },
 
+  // Endpoint ligero: solo códigos y nombres de empleados inactivos
+  getCodigosInactivos: async (req, res) => {
+    try {
+      const docs = await Empleado.find({ estado: false }).select("codigoUsuario nombreCompleto");
+      const result = docs.map(d => ({ codigoUsuario: d.codigoUsuario, nombreCompleto: d.nombreCompleto }));
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+
   deleteByCodigoUsuario: async (req, res) => {
     try {
       const { codigoUsuario } = req.params;
