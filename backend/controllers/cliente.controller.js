@@ -61,4 +61,15 @@ export const clienteController = {
       res.status(400).json({ message: error.message });
     }
   },
+
+  // Activar/Desactivar cliente (toggle) por codigoCliente
+  toggleClienteActivoByCodigo: async (req, res) => {
+    try {
+      const codigoCliente = req.params.codigoCliente;
+      const updated = await clienteService.toggleClienteActivoByCodigo(codigoCliente);
+      res.status(200).json(updated);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  },
 };

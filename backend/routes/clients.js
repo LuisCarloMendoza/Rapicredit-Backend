@@ -5,6 +5,8 @@ import { requirePermiso } from "../middleware/requirePermiso.js";
 const clienteRouter = express.Router();
 clienteRouter.post("/", requirePermiso('Gestionar clientes'), clienteController.createCliente);
 clienteRouter.put("/:codigoCliente",  requirePermiso('Gestionar clientes'), clienteController.updateClienteByCodigo);
+// Toggle activo por codigoCliente (true->false, false->true)
+clienteRouter.put("/activo/:codigoCliente", requirePermiso('Gestionar clientes'), clienteController.toggleClienteActivoByCodigo);
 clienteRouter.get("/", requirePermiso('Ver/Buscar cliente'), clienteController.getAllClientes);
 clienteRouter.get("/:codigoCliente", requirePermiso('Ver/Buscar cliente'), clienteController.getClienteByCodigo);
 // Nuevo endpoint para resumen de clientes

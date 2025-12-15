@@ -410,4 +410,20 @@ export const clienteService = {
 
     return await clienteRepository.deleteClienteByCodigo(codigoCliente);
   },
+
+  // ---------- Activar/Desactivar (toggle) ----------
+  toggleClienteActivoByCodigo: async (codigoCliente) => {
+    if (!codigoCliente) {
+      throw new Error("codigoCliente is required for toggling activo.");
+    }
+
+    const existing = await clienteRepository.findByCodigoCliente(codigoCliente);
+    if (!existing) {
+      throw new Error("Cliente with the provided codigoCliente does not exist.");
+    }
+
+    const nuevoEstado = existing.activo !== true; // true->false, false/undefined->true
+    const updated = await clienteRepository.updateClienteByCodigo(codigoCliente, { activo: nuevoEstado });
+    return updated;
+  },
 };
