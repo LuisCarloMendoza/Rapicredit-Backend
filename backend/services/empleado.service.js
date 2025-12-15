@@ -159,4 +159,18 @@ export const empleadoService = {
     }
     return await empleadoRepository.deleteByCodigoUsuario(codigoUsuario);
   },
+
+  // Toggle estado por codigoUsuario (true->false, false->true)
+  toggleEstadoByCodigoUsuario: async (codigoUsuario) => {
+    if (!codigoUsuario) {
+      throw new Error("codigoUsuario is required for toggling estado");
+    }
+    const existente = await empleadoRepository.findByCodigoUsuario(codigoUsuario);
+    if (!existente) {
+      throw new Error("Empleado with the provided codigoUsuario does not exist");
+    }
+    const nuevoEstado = existente.estado !== true; // true->false, false/undefined->true
+    const updated = await empleadoRepository.updateEmpleadoByCodigoUsuario(codigoUsuario, { estado: nuevoEstado });
+    return updated;
+  },
 };

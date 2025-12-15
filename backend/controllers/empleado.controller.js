@@ -102,5 +102,16 @@ export const userController = {
     } catch (error) {
       res.status(400).json({ message: error.message });
     }
+  },
+
+  // Toggle estado (true <-> false) por codigoUsuario
+  toggleEstadoByCodigoUsuario: async (req, res) => {
+    try {
+      const { codigoUsuario } = req.params;
+      const updated = await userService.toggleEstadoByCodigoUsuario(codigoUsuario);
+      res.status(200).json(updated);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
   }
 };

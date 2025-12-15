@@ -19,6 +19,8 @@ userRouter.get("/codigos", userController.getCodigos);
 
 //Delete user by codigoUsuario
 userRouter.delete("/codigo/:codigoUsuario", userController.deleteByCodigoUsuario);
+// Toggle estado por codigoUsuario (true->false, false->true)
+userRouter.put("/estado/:codigoUsuario", userController.toggleEstadoByCodigoUsuario);
 
 /*
 // Registro de usuario: solo gerente autenticado
