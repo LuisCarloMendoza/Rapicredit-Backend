@@ -50,7 +50,7 @@ export const empleadoService = {
   createEmpleado: async (empleadoData) => {
     if (!empleadoData || typeof empleadoData !== 'object') throw new Error('Invalid registration payload');
 
-    const { codigoUsuario, email, password, usuario, nombreCompleto, telefono, rol, permisos, actividad } = empleadoData;
+    const { codigoUsuario, email, password, usuario, nombreCompleto, telefono, rol, permisos, estado } = empleadoData;
 
     const required = ['codigoUsuario', 'email', 'password', 'usuario', 'nombreCompleto', 'telefono', 'rol'];
     const missing = [];
@@ -101,7 +101,7 @@ export const empleadoService = {
       usuario: usuario || codigoUsuario,
       nombreCompleto: nombreCompleto || usuario || codigoUsuario,
       rol: rol.toLowerCase(),
-      actividad: (typeof actividad === 'boolean') ? actividad : true,
+      estado: (typeof estado === 'boolean') ? estado : true,
       email,
       telefono,
       permisos: Array.isArray(permisos) ? permisos : [],

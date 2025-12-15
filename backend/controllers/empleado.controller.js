@@ -68,7 +68,7 @@ export const userController = {
 
   getAll: async (req, res) => {
     try {
-      const users = await User.find({ actividad: true }).select("-password");
+      const users = await Empleado.find({ estado: true }).select("-password");
       res.status(200).json({
         ok: true,
         total: users.length,

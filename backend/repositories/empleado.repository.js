@@ -26,7 +26,7 @@ export const empleadoRepository = {
     deleteByCodigoUsuario: async (codigoUsuario) => {
         return await Empleado.findOneAndUpdate(
             { codigoUsuario },
-            { actividad: false },
+            { estado: false },
             { new: true }
         );
     }

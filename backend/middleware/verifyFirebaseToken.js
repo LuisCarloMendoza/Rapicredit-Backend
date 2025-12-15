@@ -1,5 +1,5 @@
 import { admin } from '../firebase.js';         // asumiendo que así importas firebase admin
-import { EmpleadoService } from '../services/empleado.service.js'; // mantiene nombre, internamente usa empleadoRepository
+import { empleadoService } from '../services/empleado.service.js';
 
 export async function verifyFirebaseToken(req, res, next) {
   // 🔧 MODO DESARROLLO: si está activado, no validamos nada
@@ -24,7 +24,7 @@ export async function verifyFirebaseToken(req, res, next) {
     const token = header.split(' ')[1];
     const decodedToken = await admin.auth().verifyIdToken(token);
 
-    const user = await userService.getUserByFirebaseUid(decodedToken.uid);
+    const user = await empleadoService.getEmpleadoByUid(decodedToken.uid);
 
     if (!user) {
       return res.status(401).json({ message: 'Unauthorized: User not found' });
