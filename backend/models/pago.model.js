@@ -2,14 +2,14 @@ import mongoose from 'mongoose';
 
 const { Schema } = mongoose;
 
-const abonoSchema = new Schema(
+const pagoSchema = new Schema(
   {
-    codigoAbono: { type: String, required: true, unique: true, immutable: true },
+    codigoPago: { type: String, required: true, unique: true, immutable: true },
     financiamientoId: { type: Schema.Types.ObjectId, ref: 'Financiamiento', required: true },
     clienteId: { type: Schema.Types.ObjectId, ref: 'Cliente', required: true },
     cobradorId: { type: Schema.Types.ObjectId, ref: 'Empleado', required: true },
-    fechaAbono: { type: Date, required: true },
-    montoAbono: { type: Number, required: true },
+    fechaPago: { type: Date, required: true },
+    montoPago: { type: Number, required: true },
     aplicadoAMora: { type: Number, default: 0 },
     aplicadoAInteres: { type: Number, default: 0 },
     aplicadoACapital: { type: Number, default: 0 },
@@ -19,10 +19,10 @@ const abonoSchema = new Schema(
     caiUsado: { type: String, required: false, default: '' },
     rutaComprobanteFotoId: { type: Schema.Types.ObjectId, required: false },
     observaciones: { type: String, required: false, default: '' },
-    tipoAbono: { type: String, required: true, default: 'NORMAL' },
+    tipoPago: { type: String, required: true, default: 'NORMAL' },
     activo: { type: Boolean, default: true },
   },
   { timestamps: true }
 );
 
-export default mongoose.model('Abono', abonoSchema);
+export default mongoose.model('Pago', pagoSchema);

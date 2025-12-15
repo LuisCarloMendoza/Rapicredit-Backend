@@ -1,7 +1,7 @@
 // services/financiamiento.service.js
 import { financiamientoRepository } from "../repositories/financiamiento.repository.js";
 import { clienteRepository } from "../repositories/cliente.repository.js";
-import { abonoRepository } from "../repositories/abono.repository.js";
+import { pagoRepository } from "../repositories/pago.repository.js";
 // si tu repo de cobradores se llama distinto, ajústalo:
 // import { empleadoRepository } from "../repositories/user.repository.js"; // use if needed
 
@@ -252,7 +252,7 @@ export const financiamientoService = {
 
   /**
    * Devuelve el detalle completo de un financiamiento,
-   * con cliente, cobrador, abonos y totalAbonado,
+  * con cliente, cobrador, pagos y totalPagado,
    * en el shape que usa el frontend (PrestamoDetalle).
    */
   getPrestamoDetalleById: async (id) => {
@@ -297,18 +297,18 @@ export const financiamientoService = {
       }
     }
 
-    // 4) Abonos asociados a este financiamiento
-    const abonosDocs = await abonoRepository.findByFinanciamientoId(f._id);
-    const abonos = (abonosDocs || []).map((a) => ({
-      id: a._id.toString(),
-      fecha: a.fecha ? a.fecha.toISOString() : null,
-      montoCapital: Number(a.montoCapital ?? 0),
-      montoInteres: Number(a.montoInteres ?? 0),
-      montoMora: Number(a.montoMora ?? 0),
-      // agrega aquí cualquier otro campo que use tu PrestamoAbono del front
+    // 4) Pagos asociados a este financiamiento
+    const pagosDocs = await pagoRepository.findByFinanciamientoId(f._id);
+    const pagos = (pagosDocs || []).map((p) => ({
+      id: p._id.toString(),
+      fecha: p.fechaPago ? p.fechaPago.toISOString() : null,
+      montoCapital: Number(p.aplicadoACapital ?? 0),
+      montoInteres: Number(p.aplicadoAInteres ?? 0),
+      montoMora: Number(p.aplicadoAMora ?? 0),
+      // agrega aquí cualquier otro campo que use tu PrestamoPago del front
     }));
 
-    const totalAbonado = abonos.reduce(
+    const totalPagado = pagos.reduce(
       (acc, a) => acc + a.montoCapital + a.montoInteres + a.montoMora,
       0,
     );
@@ -329,8 +329,8 @@ export const financiamientoService = {
         : undefined,
       cliente,
       cobrador,
-      abonos,
-      totalAbonado,
+      pagos,
+      totalPagado,
     };
   },
 };

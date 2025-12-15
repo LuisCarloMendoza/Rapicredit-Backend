@@ -14,7 +14,7 @@ import amortizacionesRouter from "./routes/amortizaciones.js";
 import parametrosRouter from "./routes/parametros.js";
 import solicitudesRouter from "./routes/solicitudes.js";
 import gastosRouter from "./routes/gasto.js";
-import abonosRouter from "./routes/abonos.js";
+import pagosRouter from "./routes/pago.js";
 import tasasRouter from "./routes/tasas.js";
 import cors from 'cors'; //CORS
 
@@ -102,8 +102,8 @@ app.use('/api/solicitudes', solicitudesRouter);
 // Endpoints de Gastos
 app.use('/api/gastos', gastosRouter);
 
-// Endpoints de Abonos
-app.use('/api/abonos', abonosRouter);
+// Endpoints de Pagos
+app.use('/api/pagos', pagosRouter);
 
 // Endpoints de Tasas de Interés
 app.use('/api/tasas', tasasRouter);
@@ -127,7 +127,7 @@ app.use('/api/amortizaciones', verifyFirebaseToken, amortizacionesRouter);
 app.use('/api/parametros', verifyFirebaseToken, parametrosRouter);
 app.use('/api/solicitudes', verifyFirebaseToken, solicitudesRouter);
 app.use('/api/gastos', verifyFirebaseToken, gastosRouter);
-app.use('/api/abonos', verifyFirebaseToken, abonosRouter);
+app.use('/api/pagos', verifyFirebaseToken, pagosRouter);
 app.use('/api/tasas', verifyFirebaseToken, tasasRouter);
 app.use('/api/dashboard', verifyFirebaseToken, dashboardRouter);
 app.use('/api/reportes', verifyFirebaseToken, reportesRouter);

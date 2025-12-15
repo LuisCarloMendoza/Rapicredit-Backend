@@ -1,5 +1,5 @@
 import { financiamientoRepository } from "../repositories/financiamiento.repository.js";
-import { abonoRepository } from "../repositories/abono.repository.js";
+import { pagoRepository } from "../repositories/pago.repository.js";
 
 export const dashboardService = {
   getResumenDashboard: async () => {
@@ -26,7 +26,7 @@ export const dashboardService = {
       financiamientoRepository.sumCapitalInicialActivos(),
       financiamientoRepository.countVencenEntre(inicioHoy, sieteDiasDespues),
       financiamientoRepository.findRecientes(10),
-      abonoRepository.findByFechaRango(inicioHoy, finHoy),
+      pagoRepository.findByFechaRango(inicioHoy, finHoy),
     ]);
 
     const prestamosRecientes = prestamosRecientesRaw.map((f) => ({
@@ -46,18 +46,18 @@ export const dashboardService = {
       fechaVencimiento: f.fechaVencimiento,
     }));
 
-    const pagosHoy = pagosHoyRaw.map((a) => ({
-      id: a._id,
-      codigoFinanciamiento: a.financiamientoId
-        ? a.financiamientoId.codigoFinanciamiento
+    const pagosHoy = pagosHoyRaw.map((p) => ({
+      id: p._id,
+      codigoFinanciamiento: p.financiamientoId
+        ? p.financiamientoId.codigoFinanciamiento
         : null,
-      monto: a.montoAbono,
-      fechaAbono: a.fechaAbono,
-      cliente: a.clienteId
+      monto: p.montoPago,
+      fechaPago: p.fechaPago,
+      cliente: p.clienteId
         ? {
-            id: a.clienteId._id,
-            codigoCliente: a.clienteId.codigoCliente,
-            identidadCliente: a.clienteId.identidadCliente,
+            id: p.clienteId._id,
+            codigoCliente: p.clienteId.codigoCliente,
+            identidadCliente: p.clienteId.identidadCliente,
           }
         : null,
     }));

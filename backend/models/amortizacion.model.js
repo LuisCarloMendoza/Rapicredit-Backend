@@ -23,7 +23,7 @@ const amortizacionSchema = new Schema(
       default: "PENDIENTE"
     },
 
-    // Pagos realizados (en caso de abonos parciales)
+    // Pagos realizados (en caso de pagos parciales)
     pagado: { type: Boolean, required: true, default: false },
     capitalPagado: { type: Number, default: 0 },
     interesPagado: { type: Number, default: 0 },

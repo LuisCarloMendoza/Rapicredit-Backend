@@ -1,10 +1,10 @@
-import { abonoService } from '../services/abono.service.js';
+import { pagoService } from '../services/pago.service.js';
 
-export const abonoController = {
-  createAbono: async (req, res) => {
+export const pagoController = {
+  createPago: async (req, res) => {
     try {
       const payload = req.body;
-      const created = await abonoService.createAbono(payload);
+      const created = await pagoService.createPago(payload);
       res.status(201).json(created);
     } catch (error) {
       res.status(400).json({ message: error.message });
@@ -14,7 +14,7 @@ export const abonoController = {
   getByFinanciamientoId: async (req, res) => {
     try {
       const financiamientoId = req.params.financiamientoId;
-      const list = await abonoService.getByFinanciamientoId(financiamientoId);
+      const list = await pagoService.getByFinanciamientoId(financiamientoId);
       res.status(200).json(list);
     } catch (error) {
       res.status(403).json({ message: error.message });
@@ -24,7 +24,7 @@ export const abonoController = {
   getByClienteId: async (req, res) => {
     try {
       const clienteId = req.params.clienteId;
-      const list = await abonoService.getByClienteId(clienteId);
+      const list = await pagoService.getByClienteId(clienteId);
       res.status(200).json(list);
     } catch (error) {
       res.status(403).json({ message: error.message });
@@ -34,7 +34,7 @@ export const abonoController = {
   getById: async (req, res) => {
     try {
       const id = req.params.id;
-      const item = await abonoService.getById(id);
+      const item = await pagoService.getById(id);
       res.status(200).json(item);
     } catch (error) {
       res.status(404).json({ message: error.message });
@@ -44,7 +44,7 @@ export const abonoController = {
   getByCodigo: async (req, res) => {
     try {
       const codigo = req.params.codigo;
-      const item = await abonoService.getByCodigo(codigo);
+      const item = await pagoService.getByCodigo(codigo);
       res.status(200).json(item);
     } catch (error) {
       res.status(404).json({ message: error.message });
@@ -53,7 +53,7 @@ export const abonoController = {
 
   getAll: async (req, res) => {
     try {
-      const list = await abonoService.getAll();
+      const list = await pagoService.getAll();
       res.status(200).json(list);
     } catch (error) {
       res.status(403).json({ message: error.message });
@@ -64,7 +64,7 @@ export const abonoController = {
     try {
       const id = req.params.id;
       const updateData = req.body;
-      const updated = await abonoService.updateById(id, updateData);
+      const updated = await pagoService.updateById(id, updateData);
       res.status(200).json(updated);
     } catch (error) {
       res.status(400).json({ message: error.message });
@@ -75,33 +75,33 @@ export const abonoController = {
     try {
       const codigo = req.params.codigo;
       const updateData = req.body;
-      const updated = await abonoService.updateByCodigo(codigo, updateData);
+      const updated = await pagoService.updateByCodigo(codigo, updateData);
       res.status(200).json(updated);
     } catch (error) {
       res.status(400).json({ message: error.message });
     }
   },
 
-  // ==== NUEVO: GET /api/abonos/hoy ====
-  getAbonosHoy: async (req, res) => {
+  // ==== NUEVO: GET /api/pagos/hoy ====
+  getPagosHoy: async (req, res) => {
     try {
-      const abonos = await abonoService.getAbonosHoy();
-      res.status(200).json(abonos);
+      const pagos = await pagoService.getPagosHoy();
+      res.status(200).json(pagos);
     } catch (error) {
-      console.error("Error en getAbonosHoy:", error);
-      res.status(500).json({ message: "Error al obtener abonos de hoy" });
+      console.error("Error en getPagosHoy:", error);
+      res.status(500).json({ message: "Error al obtener pagos de hoy" });
     }
   },
 
-  // ==== NUEVO: GET /api/abonos/rango?desde=YYYY-MM-DD&hasta=YYYY-MM-DD ====
-  getAbonosPorRango: async (req, res) => {
+  // ==== NUEVO: GET /api/pagos/rango?desde=YYYY-MM-DD&hasta=YYYY-MM-DD ====
+  getPagosPorRango: async (req, res) => {
     try {
       const { desde, hasta } = req.query;
-      const abonos = await abonoService.getAbonosPorRango(desde, hasta);
-      res.status(200).json(abonos);
+      const pagos = await pagoService.getPagosPorRango(desde, hasta);
+      res.status(200).json(pagos);
     } catch (error) {
-      console.error("Error en getAbonosPorRango:", error);
-      res.status(500).json({ message: "Error al obtener abonos por rango de fechas" });
+      console.error("Error en getPagosPorRango:", error);
+      res.status(500).json({ message: "Error al obtener pagos por rango de fechas" });
     }
   },
 
@@ -109,7 +109,7 @@ export const abonoController = {
   deleteById: async (req, res) => {
     try {
       const id = req.params.id;
-      await abonoService.deleteById(id);
+      await pagoService.deleteById(id);
       res.status(204).end();
     } catch (error) {
       res.status(400).json({ message: error.message });
@@ -119,7 +119,7 @@ export const abonoController = {
   deleteByCodigo: async (req, res) => {
     try {
       const codigo = req.params.codigo;
-      await abonoService.deleteByCodigo(codigo);
+      await pagoService.deleteByCodigo(codigo);
       res.status(204).end();
     } catch (error) {
       res.status(400).json({ message: error.message });
