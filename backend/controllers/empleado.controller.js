@@ -83,23 +83,17 @@ export const userController = {
     }
   },
 
-  // Endpoint ligero: solo códigos y nombres de empleados activos
+  // Endpoint ligero: códigos y nombres de empleados activos e inactivos
   getCodigos: async (req, res) => {
     try {
-      const docs = await Empleado.find({ estado: true }).select("codigoUsuario nombreCompleto");
-      const result = docs.map(d => ({ codigoUsuario: d.codigoUsuario, nombreCompleto: d.nombreCompleto }));
-      res.status(200).json(result);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  },
-
-  // Endpoint ligero: solo códigos y nombres de empleados inactivos
-  getCodigosInactivos: async (req, res) => {
-    try {
-      const docs = await Empleado.find({ estado: false }).select("codigoUsuario nombreCompleto");
-      const result = docs.map(d => ({ codigoUsuario: d.codigoUsuario, nombreCompleto: d.nombreCompleto }));
-      res.status(200).json(result);
+      const docs = await Empleado.find({}).select("codigoUsuario nombreCompleto estado");
+      const activos = docs
+        .filter(d => d.estado === true)
+        .map(d => ({ codigoUsuario: d.codigoUsuario, nombreCompleto: d.nombreCompleto }));
+      const inactivos = docs
+        .filter(d => d.estado === false)
+        .map(d => ({ codigoUsuario: d.codigoUsuario, nombreCompleto: d.nombreCompleto }));
+      res.status(200).json({ activos, inactivos });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

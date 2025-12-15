@@ -16,11 +16,11 @@ userRouter.put("/:uid",  userController.updateByUid);
 userRouter.get("/",  userController.getAll);
 // Endpoint ligero: solo devuelve { codigoUsuario, nombreCompleto } de activos
 userRouter.get("/codigos", userController.getCodigos);
-// Endpoint ligero: solo devuelve { codigoUsuario, nombreCompleto } de inactivos
-userRouter.get("/codigos-inactivos", userController.getCodigosInactivos);
 
 //Delete user by codigoUsuario
 userRouter.delete("/codigo/:codigoUsuario", userController.deleteByCodigoUsuario);
+// Update user by codigoUsuario
+userRouter.put("/codigo/:codigoUsuario", userController.updateByCodigoUsuario);
 // Toggle estado por codigoUsuario (true->false, false->true)
 userRouter.put("/estado/:codigoUsuario", userController.toggleEstadoByCodigoUsuario);
 
