@@ -4,6 +4,14 @@ const { Schema } = mongoose;
 
 const prestamoSchema = new Schema(
     {
+
+        codigoPrestamo: {
+            type: String,
+            required: true,
+            unique: true,
+            immutable: true // Código único, no debe cambiar una vez asignado
+        },
+
         // Relación con la Solicitud
         solicitudId: { type: Schema.Types.ObjectId, ref: "Solicitud", required: true },
 

@@ -4,6 +4,9 @@ import { pagoRepository } from "../repositories/pago.repository.js";
 import { empleadoRepository } from "../repositories/empleado.repository.js"; // Para los cobradores/empleados
 import { buildAmortizacion } from "../utils/amortizacion.js";  // El helper que calcula la cuota y las amortizaciones
 import TasaInteres from "../models/tasa.model.js";
+import { tasaRepository } from "../repositories/tasa.repository.js";
+import { nextCodigoPrestamo } from "../utils/codigos.js"; 
+
 const FRECUENCIA_MAP = {
     "Días": "DIARIA",
     "Dias": "DIARIA",
@@ -110,7 +113,7 @@ export const prestamoService = {
         }
 
         const annualRate = tasaInteres.porcentajeInteres / 100;  // Convertir a porcentaje (ej. 12 -> 0.12)
-
+        const codigoPrestamo = nextCodigoPrestamo();
 
         // Calcular la cuota y la amortización
         const { cuota, items } = buildAmortizacion({
@@ -123,6 +126,7 @@ export const prestamoService = {
 
         // Datos para crear el préstamo
         const prestamoData = {
+            codigoPrestamo:codigoPrestamo,
             solicitudId: data.solicitudId,  // Relación con la solicitud
             clienteId: data.clienteId,      // ID del cliente
             tasaInteresId: data.tasaInteresId,  // ID de la tasa de interés
