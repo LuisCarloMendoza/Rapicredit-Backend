@@ -29,5 +29,15 @@ export const empleadoRepository = {
             { estado: false },
             { new: true }
         );
+    },
+    // Empleados activos con campos básicos para listados ligeros
+    findActivosLite: async () => {
+        return await Empleado.find({ estado: true })
+            .select("codigoUsuario nombreCompleto rol usuario email telefono");
+    },
+    // Empleados (activos e inactivos) con campos básicos + estado
+    findLiteAll: async () => {
+        return await Empleado.find({})
+            .select("codigoUsuario nombreCompleto rol usuario email telefono estado");
     }
 };

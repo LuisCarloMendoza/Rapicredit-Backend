@@ -173,4 +173,20 @@ export const empleadoService = {
     const updated = await empleadoRepository.updateEmpleadoByCodigoUsuario(codigoUsuario, { estado: nuevoEstado });
     return updated;
   },
+  
+  // Listado ligero de empleados activos con campos básicos
+  getCodigos: async () => {
+    // Ahora devuelve activos e inactivos e incluye estado
+    const docs = await empleadoRepository.findLiteAll();
+    // Devolver como objetos planos con solo los campos requeridos
+    return docs.map(d => ({
+      codigoUsuario: d.codigoUsuario,
+      nombreCompleto: d.nombreCompleto,
+      rol: d.rol,
+      usuario: d.usuario,
+      email: d.email,
+      telefono: d.telefono,
+      estado: d.estado
+    }));
+  }
 };

@@ -83,11 +83,10 @@ export const userController = {
     }
   },
 
-  // Endpoint ligero: solo códigos y nombres de empleados activos
+  // Endpoint ligero: devuelve { codigoUsuario, nombreCompleto, rol, usuario, email, telefono } de activos
   getCodigos: async (req, res) => {
     try {
-      const docs = await Empleado.find({ estado: true }).select("codigoUsuario nombreCompleto rol usuario email telefono");
-      const result = docs.map(d => ({ codigoUsuario: d.codigoUsuario, nombreCompleto: d.nombreCompleto, rol: d.rol, usuario: d.usuario, email: d.email, telefono: d.telefono }));
+      const result = await userService.getCodigos();
       res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ message: error.message });

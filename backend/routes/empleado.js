@@ -14,7 +14,7 @@ userRouter.post("/login", userController.login);
 userRouter.put("/:uid",  userController.updateByUid);
 
 userRouter.get("/",  userController.getAll);
-// Endpoint ligero: solo devuelve { codigoUsuario, nombreCompleto } de activos
+// Endpoint ligero: devuelve { codigoUsuario, nombreCompleto, rol, usuario, email, telefono } de activos
 userRouter.get("/codigos", userController.getCodigos);
 
 //Delete user by codigoUsuario
