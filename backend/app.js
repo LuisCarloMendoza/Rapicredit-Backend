@@ -17,7 +17,7 @@ import gastosRouter from "./routes/gasto.js";
 import pagosRouter from "./routes/pago.js";
 import tasasRouter from "./routes/tasas.js";
 import cors from 'cors'; //CORS
-
+import prestamoRoutes from './routes/prestamo.js';
 import dashboardRouter from "./routes/dashboard.js";
 import reportesRouter from "./routes/reportes.js";
 import { verifyFirebaseToken } from "./middleware/verifyFirebaseToken.js";
@@ -132,6 +132,7 @@ app.use('/api/tasas', verifyFirebaseToken, tasasRouter);
 app.use('/api/dashboard', verifyFirebaseToken, dashboardRouter);
 app.use('/api/reportes', verifyFirebaseToken, reportesRouter);
 
+app.use('/api/prestamos', prestamoRoutes);
 
 // Firebase Admin SDK (ESM-compatible)
 
