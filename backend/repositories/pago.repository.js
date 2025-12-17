@@ -1,4 +1,4 @@
-import Pago from '../models/Pago.model.js';
+import Pago from '../models/pago.model.js';
 
 export const pagoRepository = {
   createPago: async (data) => {
