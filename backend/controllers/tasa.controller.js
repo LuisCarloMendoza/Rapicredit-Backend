@@ -33,17 +33,6 @@ export const tasaController = {
     }
   },
 
-  updateByCodigo: async (req, res) => {
-    try {
-      const codigo = req.params.codigo;
-      const updateData = req.body;
-      const updated = await tasaService.updateByCodigo(codigo, updateData);
-      res.status(200).json(updated);
-    } catch (error) {
-      res.status(400).json({ message: error.message });
-    }
-  },
-
   getAll: async (req, res) => {
     try {
       const list = await tasaService.getAll();
@@ -63,16 +52,6 @@ export const tasaController = {
     }
   },
 
-  getByCodigo: async (req, res) => {
-    try {
-      const codigo = req.params.codigo;
-      const item = await tasaService.getByCodigo(codigo);
-      res.status(200).json(item);
-    } catch (error) {
-      res.status(404).json({ message: error.message });
-    }
-  },
-
   getById: async (req, res) => {
     try {
       const id = req.params.id;
@@ -82,14 +61,5 @@ export const tasaController = {
       res.status(404).json({ message: error.message });
     }
   },
-
-  deleteByCodigo: async (req, res) => {
-    try {
-      const codigo = req.params.codigo;
-      await tasaService.deleteByCodigo(codigo);
-      res.status(204).end();
-    } catch (error) {
-      res.status(400).json({ message: error.message });
-    }
-  }
+  
 };

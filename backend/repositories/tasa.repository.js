@@ -7,26 +7,21 @@ export const tasaRepository = {
     return await entity.save();
   },
 
-  // Buscar tasa por nombre
+  // Buscar tasa por nombre (vigentes)
   findByNombre: async (nombre) => {
-    return await TasaInteres.findOne({ nombre, activa: true });
+    return await TasaInteres.findOne({ nombre, vigente: true });
   },
 
-  // Buscar tasa por código
-  findByCodigo: async (codigoTasa) => {
-    return await TasaInteres.findOne({ codigoTasa, activa: true });
-  },
-
-  // Buscar tasa por ID (y devolver solo porcentajeInteres)
+  // Buscar tasa por ID (y devolver solo tasaAnual)
   findById: async (id) => {
-    const tasa = await TasaInteres.findOne({ _id: id, activa: true });
+    const tasa = await TasaInteres.findOne({ _id: id, vigente: true });
     if (!tasa) throw new Error("Tasa de interés no encontrada");
-    return tasa.porcentajeInteres;  // Solo devolvemos el porcentaje de la tasa
+    return tasa.tasaAnual;  // Solo devolvemos el porcentaje anual
   },
 
-  // Obtener todas las tasas activas
+  // Obtener todas las tasas vigentes
   findAll: async () => {
-    return await TasaInteres.find({ activa: true });
+    return await TasaInteres.find({ vigente: true });
   },
 
   // Actualizar tasa por nombre
@@ -37,26 +32,11 @@ export const tasaRepository = {
     return await TasaInteres.findOneAndUpdate({ nombre }, updateData, { new: true, runValidators: true });
   },
 
-  // Actualizar tasa por código
-  updateByCodigo: async (codigoTasa, updateData) => {
-    if (updateData && Object.prototype.hasOwnProperty.call(updateData, 'codigoTasa')) delete updateData.codigoTasa;
-    return await TasaInteres.findOneAndUpdate({ codigoTasa }, updateData, { new: true, runValidators: true });
-  },
-
   // Actualizar tasa por ID
   updateById: async (id, updateData) => {
     if (updateData && Object.prototype.hasOwnProperty.call(updateData, 'nombre')) {
       delete updateData.nombre;
     }
     return await TasaInteres.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
-  },
-
-  // Eliminar tasa por código
-  deleteByCodigo: async (codigoTasa) => {
-    return await TasaInteres.findOneAndUpdate(
-      { codigoTasa },
-      { activa: false },
-      { new: true }
-    );
   }
 };
