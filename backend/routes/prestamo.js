@@ -5,7 +5,7 @@ import { requirePermiso } from '../middleware/requirePermiso.js';
 const prestamoRouter = express.Router();
 
 // Crear préstamo
-prestamoRouter.post('/', requirePermiso('Gestionar creditos'), prestamoController.createPrestamo);
+//prestamoRouter.post('/', requirePermiso('Gestionar creditos'), prestamoController.createPrestamo);
 
 // Actualizar préstamo por código
 prestamoRouter.put('/:codigoPrestamo', requirePermiso('Gestionar creditos'), prestamoController.updatePrestamoByCodigo);

@@ -118,6 +118,15 @@ export const solicitudController = {
     }
   },
 
+  getAllSolicitudes: async (req, res) => {
+    try {
+      const solicitudes = await solicitudService.getAllSolicitudes();
+      res.status(200).json(solicitudes);
+    } catch (error) {
+      res.status(403).json({ message: error.message });
+    }
+  },
+
   generateApprovedReport: async (req, res) => {
     try {
       // Accept parameters from query or body: { frequency: 'weekly'|'monthly'|'quarterly'|'yearly', from: 'YYYY-MM-DD', to: 'YYYY-MM-DD' }

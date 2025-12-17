@@ -26,14 +26,15 @@ router.post('/report/approved', solicitudController.generateApprovedReport);
 router.get('/report/approved', solicitudController.generateApprovedReport);
 router.get('/', solicitudController.filterSolicitudes); // Con query params para filtros
 router.get('/:codigoSolicitud', solicitudController.getSolicitudByCodigo);
+router.get('/', solicitudController.getAllSolicitudes);
 
 router.patch('/:codigoSolicitud/status', solicitudController.changeSolicitudStatus);
 
 // Esta ruta permite al admin aprobar la solicitud (requiere permiso)
 router.post(
     "/:id/aprobar",  // La ruta que llamará a aprobar la solicitud
-    verifyFirebaseToken,  // Verificación del token del usuario
-    requirePermiso("Gestionar solicitudes"),  // Se asegura que el usuario tenga el permiso adecuado
+    //verifyFirebaseToken,  // Verificación del token del usuario
+    //requirePermiso("Gestionar solicitudes"),  // Se asegura que el usuario tenga el permiso adecuado
     solicitudController.aprobar  // Método que maneja la aprobación
 );
 

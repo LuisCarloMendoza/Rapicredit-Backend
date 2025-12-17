@@ -12,6 +12,7 @@ const FRECUENCIA_MAP = {
   "Días": "DIARIA",
   "Dias": "DIARIA",
   "DIAS": "DIARIA",
+  "DIARIO": "DIARIA",
   "Semanas": "SEMANAL",
   "Quincenas": "QUINCENAL",
   "Meses": "MENSUAL",
@@ -48,6 +49,8 @@ export const solicitudService = {
         finalidadCredito,
         usuarioCreacionId
       } = solicitudData;
+      solicitudData.tasaInteresIdAprobada = solicitudData.tasInteresId; // corregir typo
+      solicitudData.frecuenciaPagoAprobada = solicitudData.frecuenciaPago; // agregar frecuenciaPagoAprobada
 
       // Validación de campos requeridos
       const requiredFields = [
@@ -114,7 +117,7 @@ export const solicitudService = {
       const solicitudes = await Solicitud.find({ activo: true })
         .populate('clienteId')
         .populate('vendedorId')
-        .populate('tasInteresId')
+        .populate('tasaInteresId')
         .populate('frecuenciaPago')
         .populate('usuarioCreacionId')
         .populate('usuarioDecisionId');
@@ -203,7 +206,7 @@ export const solicitudService = {
       const solicitudes = await Solicitud.find({ estadoSolicitud, activo: true })
         .populate('clienteId')
         .populate('vendedorId')
-        .populate('tasInteresId')
+        .populate('tasaInteresIdAprobada')
         .populate('frecuenciaPago')
         .populate('usuarioCreacionId')
         .populate('usuarioDecisionId');
@@ -261,7 +264,7 @@ export const solicitudService = {
       const solicitudes = await Solicitud.find({ ...query, activo: true })
         .populate('clienteId')
         .populate('vendedorId')
-        .populate('tasInteresId')
+        .populate('tasaInteresIdAprobada')
         .populate('frecuenciaPago')
         .populate('usuarioCreacionId')
         .populate('usuarioDecisionId')
