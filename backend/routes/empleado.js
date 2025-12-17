@@ -13,6 +13,9 @@ userRouter.post("/login", userController.login);
 
 userRouter.put("/:uid",  userController.updateByUid);
 
+// Update user by codigoUsuario (same behavior as updateByUid)
+userRouter.put("/codigo/:codigoUsuario", userController.updateByCodigoUsuario);
+
 userRouter.get("/",  userController.getAll);
 // Endpoint ligero: devuelve { codigoUsuario, nombreCompleto, rol, usuario, email, telefono } de activos
 userRouter.get("/codigos", userController.getCodigos);
