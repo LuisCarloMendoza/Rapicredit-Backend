@@ -95,6 +95,17 @@ export const tasaService = {
     return await tasaRepository.updateById(id, updateData);
   },
 
+  // Actualizar por codigoTasa
+  updateByCodigoTasa: async (codigoTasa, updateData) => {
+    if (!codigoTasa) throw new Error('codigoTasa is required');
+    if (updateData && Object.prototype.hasOwnProperty.call(updateData, 'nombre')) delete updateData.nombre;
+    if (updateData && Object.prototype.hasOwnProperty.call(updateData, 'codigoTasa')) delete updateData.codigoTasa;
+    tasaService._validateUpdateData(updateData);
+    const existente = await tasaRepository.findByCodigoTasa(codigoTasa);
+    if (!existente) throw new Error('Tasa with the provided codigoTasa does not exist.');
+    return await tasaRepository.updateByCodigoTasa(codigoTasa, updateData);
+  },
+
   getAll: async () => {
     return await tasaRepository.findAll();
   },
@@ -109,5 +120,37 @@ export const tasaService = {
     const item = await tasaRepository.findById(id);
     if (!item && item !== 0) throw new Error('Tasa with the provided id does not exist.');
     return item;
+  },
+
+  // Obtener por codigoTasa (incluye vigentes e inactivas)
+  getByCodigoTasa: async (codigoTasa) => {
+    const item = await tasaRepository.findByCodigoTasa(codigoTasa);
+    if (!item) throw new Error('Tasa with the provided codigoTasa does not exist.');
+    return item;
+  },
+
+  // Toggle vigente por codigoTasa
+  toggleVigenteByCodigoTasa: async (codigoTasa) => {
+    if (!codigoTasa) throw new Error('codigoTasa is required for toggling vigente');
+    const updated = await tasaRepository.toggleVigenteByCodigoTasa(codigoTasa);
+    if (!updated) throw new Error('Tasa with the provided codigoTasa does not exist.');
+    return updated;
+  },
+
+  // Listado ligero (activos e inactivos) para buscar por codigoTasa y editar
+  getCodigos: async () => {
+    const docs = await tasaRepository.findLiteAll();
+    return docs.map(d => ({
+      codigoTasa: d.codigoTasa,
+      nombre: d.nombre,
+      tasaAnual: d.tasaAnual,
+      tasaMora: d.tasaMora,
+      vigente: d.vigente
+    }));
+  },
+
+  // Todas las tasas (activos e inactivos)
+  getAllAll: async () => {
+    return await tasaRepository.findAllAll();
   }
 };
