@@ -34,7 +34,7 @@ app.use(express.json());
 
 const port = process.env.PORT || 3001;
 
-const allowedOrigin = process.env.CORS_ORIGIN || "http://localhost:3000";
+const allowedOrigin = process.env.CORS_ORIGIN || "http://localhost:3000" || "https://rapicreditfrontend.netlify.app";
 
 app.use(
   cors({
