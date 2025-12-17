@@ -13,7 +13,7 @@ userRouter.post("/login", userController.login);
 
 userRouter.put("/:uid",  userController.updateByUid);
 
-// Update user by codigoUsuario (same behavior as updateByUid)
+// Update user by codigoUsuario 
 userRouter.put("/codigo/:codigoUsuario", userController.updateByCodigoUsuario);
 
 userRouter.get("/",  userController.getAll);

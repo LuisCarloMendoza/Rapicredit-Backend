@@ -129,6 +129,32 @@ export const empleadoService = {
     if(!existe){
       throw new Error("Empleado with the provided UID does not exist");
     }
+    // If email provided and changed, validate and ensure uniqueness
+    if (updateData && typeof updateData.email === 'string' && updateData.email !== existe.email) {
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(updateData.email)) {
+        throw new Error('Invalid email format');
+      }
+      const emailTaken = await empleadoRepository.findByEmail(updateData.email);
+      if (emailTaken && String(emailTaken._id) !== String(existe._id)) {
+        throw new Error('An empleado with this email already exists.');
+      }
+    }
+
+    // Sync to Firebase if needed
+    const firebasePayload = {};
+    if (updateData && typeof updateData.email === 'string' && updateData.email.trim() !== '' && updateData.email !== existe.email) {
+      firebasePayload.email = updateData.email;
+    }
+    if (updateData && typeof updateData.telefono === 'string' && updateData.telefono.trim() !== '' && updateData.telefono !== existe.telefono) {
+      firebasePayload.phoneNumber = updateData.telefono;
+    }
+    if (Object.keys(firebasePayload).length > 0) {
+      try {
+        await admin.auth().updateUser(uid, firebasePayload);
+      } catch (err) {
+        throw new Error(`Firebase update failed: ${err.message}`);
+      }
+    }
     const updatedEmpleado = await empleadoRepository.updateEmpleadoByUid(uid, updateData);
     return updatedEmpleado;
   },
@@ -141,6 +167,32 @@ export const empleadoService = {
     const existe = await empleadoRepository.findByCodigoUsuario(codigoUsuario);
     if (!existe) {
       throw new Error("Empleado with the provided codigoUsuario does not exist");
+    }
+    // If email provided and changed, validate and ensure uniqueness
+    if (updateData && typeof updateData.email === 'string' && updateData.email !== existe.email) {
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(updateData.email)) {
+        throw new Error('Invalid email format');
+      }
+      const emailTaken = await empleadoRepository.findByEmail(updateData.email);
+      if (emailTaken && String(emailTaken._id) !== String(existe._id)) {
+        throw new Error('An empleado with this email already exists.');
+      }
+    }
+
+    // Sync to Firebase using uid from the found empleado
+    const firebasePayload = {};
+    if (updateData && typeof updateData.email === 'string' && updateData.email.trim() !== '' && updateData.email !== existe.email) {
+      firebasePayload.email = updateData.email;
+    }
+    if (updateData && typeof updateData.telefono === 'string' && updateData.telefono.trim() !== '' && updateData.telefono !== existe.telefono) {
+      firebasePayload.phoneNumber = updateData.telefono;
+    }
+    if (Object.keys(firebasePayload).length > 0) {
+      try {
+        await admin.auth().updateUser(existe.uid, firebasePayload);
+      } catch (err) {
+        throw new Error(`Firebase update failed: ${err.message}`);
+      }
     }
     const updatedEmpleado = await empleadoRepository.updateEmpleadoByCodigoUsuario(
       codigoUsuario,
