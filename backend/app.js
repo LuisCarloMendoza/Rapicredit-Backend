@@ -34,13 +34,23 @@ app.use(express.json());
 
 const port = process.env.PORT || 3001;
 
-const allowedOrigin = process.env.CORS_ORIGIN || "http://localhost:3000" || "https://rapicreditfrontend.netlify.app";
+const allowedOrigins = [
+  process.env.CORS_ORIGIN,              
+  "http://localhost:3000",
+  "https://rapicreditfrontend.netlify.app",
+].filter(Boolean);
 
 app.use(
   cors({
-    origin: allowedOrigin,
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+
+      return callback(new Error("Not allowed by CORS: " + origin));
+    },
     credentials: true,
-  }),
+  })
 );
 
 // ---- MongoDB Client ----
